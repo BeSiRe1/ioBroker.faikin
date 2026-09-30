@@ -2,7 +2,7 @@
 
 const { createServer } = require('node:net');
 const utils = require('@iobroker/adapter-core');
-const { Aedes } = require('aedes');
+const createBroker = require('aedes');
 
 const STATUS_LABELS = {
     online: 'Online-Status', power: 'Ein/Aus', heat: 'Heizbetrieb aktiv', home: 'Raumtemperatur',
@@ -149,7 +149,7 @@ class FaikinAdapter extends utils.Adapter {
     async startBroker() {
         const port = Number(this.config.port);
         if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error(`Ungültiger MQTT-Port: ${this.config.port}`);
-        this.broker = await Aedes.createBroker({ authenticate: (client, username, password, callback) => {
+        this.broker = createBroker({ authenticate: (client, username, password, callback) => {
             const expectedUser = String(this.config.username || '');
             const expectedPassword = String(this.config.password || '');
             const suppliedUser = username ? username.toString() : '';
