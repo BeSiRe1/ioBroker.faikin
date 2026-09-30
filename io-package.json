@@ -13,28 +13,32 @@
       "en": "Faikin",
       "de": "Faikin"
     },
-    "desc": "Controls and reads Faikin/Faikout air conditioners through an embedded MQTT broker.",
-    "descLang": {
+    "desc": {
       "en": "Controls and reads Faikin/Faikout air conditioners through an embedded MQTT broker.",
       "de": "Steuert und überwacht Faikin/Faikout-Klimaanlagen über einen integrierten MQTT-Broker."
     },
     "authors": [
       "Rene"
     ],
-    "author": "Rene",
-    "license": "MIT",
     "licenseInformation": {
       "license": "MIT",
       "type": "free",
       "link": "https://opensource.org/license/mit"
     },
     "icon": "faikin.svg",
+    "extIcon": "https://raw.githubusercontent.com/BeSiRe1/ioBroker.faikin/main/admin/faikin.svg",
     "readme": "https://github.com/BeSiRe1/ioBroker.faikin/blob/main/README.md",
     "docs": {
       "en": "README.md",
       "de": "README.md"
     },
-    "keywords": ["faikin", "faikout", "daikin", "mqtt", "climate-control"],
+    "keywords": [
+      "faikin",
+      "faikout",
+      "daikin",
+      "mqtt",
+      "climate-control"
+    ],
     "platform": "Javascript/Node.js",
     "mode": "daemon",
     "connectionType": "local",
@@ -50,7 +54,8 @@
     "loglevel": "info",
     "dependencies": [
       "js-controller"
-    ]
+    ],
+    "tier": 3
   },
   "native": {
     "port": 1884,
