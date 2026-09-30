@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "faikin",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "news": {
+      "0.1.1": {
+        "en": "Use a generic default hostname for general MQTT topics.",
+        "de": "Neutralen Standard-Hostname für allgemeine MQTT-Themen verwenden."
+      },
       "0.1.0": {
         "en": "Initial adapter implementation with an embedded MQTT broker, Faikin status objects, controls and generic MQTT access.",
         "de": "Erste Adapterversion mit integriertem MQTT-Broker, Faikin-Statusobjekten, Steuerungen und allgemeinem MQTT-Zugriff."
@@ -26,7 +30,6 @@
       "link": "https://opensource.org/license/mit"
     },
     "icon": "faikin.svg",
-    "extIcon": "https://raw.githubusercontent.com/BeSiRe1/ioBroker.faikin/main/admin/faikin.svg",
     "readme": "https://github.com/BeSiRe1/ioBroker.faikin/blob/main/README.md",
     "docs": {
       "en": "README.md",
@@ -55,13 +58,13 @@
     "dependencies": [
       "js-controller"
     ],
+    "extIcon": "https://raw.githubusercontent.com/BeSiRe1/ioBroker.faikin/main/admin/faikin.svg",
     "tier": 3
   },
   "native": {
     "port": 1884,
     "bind": "0.0.0.0",
-    "hostname": "Faikin-Wohnzimmer",
-    "room": "Wohnzimmer",
+    "hostname": "Faikin",
     "username": "",
     "password": ""
   }

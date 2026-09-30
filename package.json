@@ -1,6 +1,6 @@
 {
   "name": "iobroker.faikin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "ioBroker adapter for Daikin air conditioners using Faikin/Faikout MQTT",
   "author": "Rene",
   "license": "MIT",

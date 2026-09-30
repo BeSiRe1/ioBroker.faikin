@@ -1,52 +1,83 @@
 {
   "i18n": true,
-  "type": "tabs",
+  "type": "panel",
   "items": {
-    "connection": {
-      "type": "panel",
-      "label": "Verbindung und Gerät",
-      "items": {
-        "port": {
-          "type": "number",
-          "label": "MQTT-Port",
-          "default": 1884,
-          "min": 1,
-          "max": 65535
-        },
-        "bind": {
-          "type": "text",
-          "label": "Bind-Adresse (0.0.0.0 = alle Netzwerkschnittstellen)",
-          "default": "0.0.0.0"
-        },
-        "hostname": {
-          "type": "text",
-          "label": "Standard-Hostname für allgemeine MQTT-Themen",
-          "default": "Faikin-Wohnzimmer"
-        },
-        "room": {
-          "type": "text",
-          "label": "Raumname in ioBroker",
-          "default": "Wohnzimmer"
-        },
-        "username": {
-          "type": "text",
-          "label": "MQTT-Benutzername (optional)"
-        },
-        "password": {
-          "type": "password",
-          "label": "MQTT-Passwort (optional)"
-        }
-      }
+    "_connectionHeader": {
+      "type": "header",
+      "text": "Verbindungseinstellungen",
+      "size": 3,
+      "sm": 12
     },
-    "help": {
-      "type": "panel",
-      "label": "Einrichtung",
-      "items": {
-        "helpText": {
-          "type": "staticText",
-          "text": "In jedem Faikin-MQTT-Menü als Host die IP-Adresse des ioBroker-Servers und als Port den oben eingestellten Port eintragen. Bei gesetzten Zugangsdaten dieselben Werte in allen Modulen eintragen. Jedes Modul braucht einen eigenen MQTT-Hostname; erkannte Geräte und ihre Datenpunkte werden automatisch angelegt. Der Port muss auf dem ioBroker-Server frei und im lokalen Netzwerk erreichbar sein."
-        }
-      }
+    "bind": {
+      "type": "text",
+      "label": "Bind-Adresse",
+      "default": "0.0.0.0",
+      "help": "0.0.0.0 bedeutet: Zugriff über alle Netzwerkschnittstellen.",
+      "sm": 8,
+      "md": 8,
+      "lg": 8
+    },
+    "port": {
+      "type": "number",
+      "label": "MQTT-Port",
+      "default": 1884,
+      "min": 1,
+      "max": 65535,
+      "sm": 4,
+      "md": 4,
+      "lg": 4
+    },
+    "_authenticationHeader": {
+      "newLine": true,
+      "type": "header",
+      "text": "Authentifizierung",
+      "size": 3,
+      "sm": 12
+    },
+    "username": {
+      "newLine": true,
+      "type": "text",
+      "label": "MQTT-Benutzername (optional)",
+      "sm": 6,
+      "md": 6,
+      "lg": 6
+    },
+    "password": {
+      "type": "password",
+      "label": "MQTT-Passwort (optional)",
+      "sm": 6,
+      "md": 6,
+      "lg": 6
+    },
+    "_topicsHeader": {
+      "newLine": true,
+      "type": "header",
+      "text": "Geräte und MQTT-Themen",
+      "size": 3,
+      "sm": 12
+    },
+    "hostname": {
+      "newLine": true,
+      "type": "text",
+      "label": "Standard-Hostname für allgemeine MQTT-Themen",
+      "default": "Faikin",
+      "help": "Jedes Faikin-Modul wird anhand seines eigenen MQTT-Hostnamens als Gerät angelegt.",
+      "sm": 12,
+      "md": 8,
+      "lg": 6
+    },
+    "_setupHeader": {
+      "newLine": true,
+      "type": "header",
+      "text": "Einrichtung",
+      "size": 3,
+      "sm": 12
+    },
+    "_helpText": {
+      "newLine": true,
+      "type": "staticText",
+      "text": "In jedem Faikin-MQTT-Menü als Host die IP-Adresse des ioBroker-Servers und als Port den oben eingestellten Port eintragen. Bei gesetzten Zugangsdaten dieselben Werte in allen Modulen eintragen. Jedes Modul braucht einen eigenen MQTT-Hostname; erkannte Geräte und ihre Datenpunkte werden automatisch angelegt. Der Port muss auf dem ioBroker-Server frei und im lokalen Netzwerk erreichbar sein.",
+      "sm": 12
     }
   }
 }

@@ -41,7 +41,7 @@ const CONTROL_TO_FIELD = {
 };
 const FIELD_TO_CONTROL = Object.fromEntries(Object.entries(CONTROL_TO_FIELD).map(([control, field]) => [field, control]));
 const DEFAULTS = {
-    port: 1884, bind: '0.0.0.0', hostname: 'Faikin-Wohnzimmer', room: 'Wohnzimmer', username: '', password: ''
+    port: 1884, bind: '0.0.0.0', hostname: 'Faikin', username: '', password: ''
 };
 
 class FaikinAdapter extends utils.Adapter {
@@ -87,7 +87,7 @@ class FaikinAdapter extends utils.Adapter {
         this.deviceRoots.set(hostname, deviceId);
         this.rootHosts.set(deviceId, hostname);
         await this.setObjectNotExistsAsync(deviceId, {
-            type: 'device', common: { name: hostname === this.hostname && this.config.room ? this.config.room : hostname }, native: {}
+            type: 'device', common: { name: hostname }, native: {}
         });
         await this.setObjectNotExistsAsync(`${deviceId}.Status`, {
             type: 'channel', common: { name: 'Status' }, native: {}
