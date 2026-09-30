@@ -1,0 +1,40 @@
+{
+  "name": "iobroker.faikin",
+  "version": "0.1.0",
+  "description": "ioBroker adapter for Daikin air conditioners using Faikin/Faikout MQTT",
+  "author": "Rene",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "check": "node --check main.js",
+    "test": "npm run test:package && npm run test:integration",
+    "test:package": "mocha --exit test/package.js",
+    "test:integration": "mocha --exit test/integration.js"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.4.3",
+    "aedes": "^0.51.3"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BeSiRe1/ioBroker.faikin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BeSiRe1/ioBroker.faikin/issues"
+  },
+  "homepage": "https://github.com/BeSiRe1/ioBroker.faikin#readme",
+  "keywords": [
+    "iobroker",
+    "faikin",
+    "faikout",
+    "daikin",
+    "mqtt"
+  ],
+  "devDependencies": {
+    "@iobroker/testing": "^6.2.2",
+    "mocha": "^12.0.0"
+  }
+}

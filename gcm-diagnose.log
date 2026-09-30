@@ -1,0 +1,285 @@
+﻿Diagnose log at 2026-09-30T17:23:34Z
+
+AppPath: C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\mingw64\bin\git-credential-manager.exe
+InstallDir: C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\mingw64\bin\
+Version: 2.7.3+5fa7116896c82164996a609accd1c5ad90fe730a
+
+------------
+Diagnostic: Environment
+Skipped: False
+Success: True
+Exception: None
+Log:
+OSType: Windows
+OSVersion: 10.0 (build 26200)
+Reading environment variables... OK
+ Variables:
+SystemDrive=C:
+ProgramFiles(x86)=C:\Program Files (x86)
+MSYSTEM=MINGW64
+ProgramW6432=C:\Program Files
+PAGER=cat
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 151 Stepping 2, GenuineIntel
+TMP=C:\Users\Rene\AppData\Local\Temp
+CODEX_INTERNAL_ORIGINATOR_OVERRIDE=Codex Desktop
+PROCESSOR_LEVEL=6
+Path=C:\Users\Rene\.codex\tmp\arg0\codex-arg0gnkdPC;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\PuTTY\;C:\Program Files\dotnet\;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Rene\AppData\Local\Microsoft\WindowsApps;C:\Users\Rene\AppData\Local\GitHubDesktop\bin;C:\Users\Rene\AppData\Local\Programs\Ollama;C:\Users\Rene\AppData\Local\OpenAI\Codex\bin\0ddb895c950eaeba;C:\Users\Rene\AppData\Local\OpenAI\Codex\bin\faa963e871dd422c
+PUBLIC=C:\Users\Public
+RUST_LOG=warn
+PROCESSOR_REVISION=9702
+USERPROFILE=C:\Users\Rene
+CODEX_VERSION=0.158.0-alpha.2.1
+GIT_CONFIG_VALUE_1=C:\Users\Rene\Documents\Codex\2026-09-30\files-pasted-by-the-user-projekt\outputs\iobroker-faikin/*
+TMPDIR=C:\Users\Rene\AppData\Local\Temp
+TEMP=C:\Users\Rene\AppData\Local\Temp
+FPS_BROWSER_APP_PROFILE_STRING=Internet Explorer
+FPS_BROWSER_USER_PROFILE_STRING=Default
+LOGONSERVER=\\PC-BšRO
+TERM=dumb
+NO_COLOR=1
+SHELL=C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe
+ProgramData=C:\ProgramData
+CODEX_THREAD_ID=01a0f17a-5c1d-7e91-997b-26f88d0c8cc4
+CODEX_MCP_NODE_PATH=C:\Users\Rene\AppData\Local\OpenAI\Codex\runtimes\cua_node\b63ee7ee40c23b77\bin\node.exe
+USERNAME=Rene
+GH_PAGER=cat
+OneDrive=C:\Users\Rene\OneDrive
+PATH=C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\mingw64\bin;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\mingw64\bin;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\usr\bin;C:\Users\Rene\bin;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\mingw64\bin;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\usr\bin;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Rene\.codex\tmp\arg0\codex-arg0gnkdPC;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\PuTTY\;C:\Program Files\dotnet\;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Rene\AppData\Local\Microsoft\WindowsApps;C:\Users\Rene\AppData\Local\GitHubDesktop\bin;C:\Users\Rene\AppData\Local\Programs\Ollama;C:\Users\Rene\AppData\Local\OpenAI\Codex\bin\0ddb895c950eaeba;C:\Users\Rene\AppData\Local\OpenAI\Codex\bin\faa963e871dd422c
+ZSH_TMUX_AUTOSTARTED=true
+CommonProgramFiles=C:\Program Files\Common Files
+windir=C:\WINDOWS
+SystemRoot=C:\WINDOWS
+CODEX_APP_TOOLS_PIPE_PATH=\\.\pipe\codex-browser-use-88b94bdd-215a-4e61-99d2-613e75eee88b
+CODEX_SHELL=1
+GIT_CONFIG_KEY_0=safe.directory
+LC_CTYPE=C.UTF-8
+ZSH_TMUX_AUTOSTART=false
+HOMEPATH=\Users\Rene
+CODEX_TECTONIC_PATH=C:\Program Files\WindowsApps\OpenAI.Codex_26.924.2738.0_x64__2p2nqsd0c76g0\app\resources\tectonic\tectonic.exe
+GIT_CONFIG_VALUE_0=C:\Users\Rene\Documents\Codex\2026-09-30\files-pasted-by-the-user-projekt\outputs\iobroker-faikin
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+ALLUSERSPROFILE=C:\ProgramData
+CommonProgramW6432=C:\Program Files\Common Files
+LESS=
+OLLAMA_HOST=0.0.0.0:11434
+DISABLE_AUTO_UPDATE=true
+CODEX_WINDOWS_SANDBOX_PACKAGE_FAMILY=OpenAI.Codex_2p2nqsd0c76g0
+PLINK_PROTOCOL=ssh
+PROCESSOR_ARCHITECTURE=AMD64
+CODEX_PERMISSION_PROFILE=:workspace
+GIT_CONFIG_COUNT=2
+DriverData=C:\Windows\System32\Drivers\DriverData
+HOMEDRIVE=C:
+CODEX_SAGE_BACKFILL_TRACKER_TAB_REUSE=1
+GIT_TRACE2_PARENT_SID=b0382bcd-304d-4b02-b9d8-c880198008fc
+NUMBER_OF_PROCESSORS=20
+OS=Windows_NT
+OMP_WAIT_POLICY=PASSIVE
+CODEX_SESSION_ID=01a0f17a-5c1d-7e91-997b-26f88d0c8cc4
+GIT_CONFIG_KEY_1=safe.directory
+LANG=C.UTF-8
+ComSpec=C:\WINDOWS\system32\cmd.exe
+USERDOMAIN_ROAMINGPROFILE=PC-BšRO
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+HOME=C:\Users\Rene
+PSModulePath=C:\Users\Rene\Documents\PowerShell\Modules;C:\Program Files\PowerShell\Modules;c:\users\rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\Modules;C:\Users\Rene\Documents\WindowsPowerShell\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+ProgramFiles=C:\Program Files
+CODEX_CI=1
+LC_ALL=C.UTF-8
+APPDATA=C:\Users\Rene\AppData\Roaming
+USERDOMAIN=PC-BšRO
+COMPUTERNAME=PC-BšRO
+LOCALAPPDATA=C:\Users\Rene\AppData\Local
+JD2_HOME=C:\Users\Rene\AppData\Local\JDownloader 2.0
+GIT_EXEC_PATH=C:\Users\Rene\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\mingw64\bin
+GIT_PAGER=cat
+COLORTERM=
+KMP_BLOCKTIME=0
+LOG_FORMAT=json
+
+
+------------
+Diagnostic: File system
+Skipped: False
+Success: True
+Exception: None
+Log:
+Temporary directory is 'C:\Users\Rene\AppData\Local\Temp\'...
+Checking basic file I/O...
+Writing to temporary file 'C:\Users\Rene\AppData\Local\Temp\2cbe4f56b7adb5b8384feef2'... OK
+Reading from temporary file 'C:\Users\Rene\AppData\Local\Temp\2cbe4f56b7adb5b8384feef2'... OK
+Deleting temporary file 'C:\Users\Rene\AppData\Local\Temp\2cbe4f56b7adb5b8384feef2'... OK
+Testing IFileSystem instance...
+UserHomePath: 
+UserDataDirectoryPath: .gcm
+GetCurrentDirectory(): C:\Users\Rene\Documents\Codex\2026-09-30\files-pasted-by-the-user-projekt\outputs\iobroker-faikin
+
+------------
+Diagnostic: Networking
+Skipped: False
+Success: False
+Exception:
+System.Net.Http.HttpRequestException: Fehler beim Senden der Anforderung. ---> System.Net.WebException: Die zugrunde liegende Verbindung wurde geschlossen: Unbekannter Fehler beim Empfangen.. ---> System.ComponentModel.Win32Exception: Im Sicherheitspaket sind keine Anmeldeinformationen verfügbar
+   bei System.Net.SSPIWrapper.AcquireCredentialsHandle(SSPIInterface SecModule, String package, CredentialUse intent, SecureCredential2 scc)
+   bei System.Net.Security.SecureChannel.AcquireCredentialsHandle(CredentialUse credUsage, SecureCredential2& secureCredential)
+   bei System.Net.Security.SecureChannel.AcquireCredentialsHandle(CredentialUse credUsage, X509Certificate2 selectedCert, Flags flags)
+   bei System.Net.Security.SecureChannel.AcquireClientCredentials(Byte[]& thumbPrint)
+   bei System.Net.Security.SecureChannel.GenerateToken(Byte[] input, Int32 offset, Int32 count, Byte[]& output)
+   bei System.Net.Security.SecureChannel.NextMessage(Byte[] incoming, Int32 offset, Int32 count)
+   bei System.Net.Security.SslState.StartSendBlob(Byte[] incoming, Int32 count, AsyncProtocolRequest asyncRequest, Boolean renegotiation)
+   bei System.Net.Security.SslState.ForceAuthentication(Boolean receiveFirst, Byte[] buffer, AsyncProtocolRequest asyncRequest, Boolean renegotiation)
+   bei System.Net.Security.SslState.ProcessAuthentication(LazyAsyncResult lazyResult)
+   bei System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+   bei System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+   bei System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   bei System.Net.TlsStream.ProcessAuthentication(LazyAsyncResult result)
+   bei System.Net.TlsStream.BeginWrite(Byte[] buffer, Int32 offset, Int32 size, AsyncCallback asyncCallback, Object asyncState)
+   bei System.Net.ConnectStream.WriteHeaders(Boolean async)
+   --- Ende der internen Ausnahmestapelüberwachung ---
+   bei System.Net.HttpWebRequest.EndGetResponse(IAsyncResult asyncResult)
+   bei System.Net.Http.HttpClientHandler.GetResponseCallback(IAsyncResult ar)
+   --- Ende der internen Ausnahmestapelüberwachung ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitCredentialManager.Diagnostics.NetworkingDiagnostic.<RunInternalAsync>d__4.MoveNext()
+--- Ende der Stapelüberwachung vom vorhergehenden Ort, an dem die Ausnahme ausgelöst wurde ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitCredentialManager.Diagnostics.Diagnostic.<RunAsync>d__6.MoveNext()
+Log:
+Checking networking and HTTP stack...
+Creating HTTP client... OK
+IsNetworkAvailable: True
+Sending HEAD request to http://example.com...Sending HEAD request to https://example.com... OK
+
+------------
+Diagnostic: Git
+Skipped: False
+Success: True
+Exception: None
+Log:
+Getting Git version... OK
+Git version is '2.53.0.windows.3'
+Locating current repository...Git repository at 'C:/Users/Rene/Documents/Codex/2026-09-30/files-pasted-by-the-user-projekt/outputs/iobroker-faikin/.git'
+ OK
+Listing all Git configuration... OK
+Git configuration:
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	core.symlinks=false
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	core.autocrlf=true
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	core.fscache=true
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	color.interactive=true
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	color.ui=auto
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	pack.packsizelimit=2g
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	help.format=html
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	diff.astextplain.textconv=astextplain
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	rebase.autosquash=true
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	filter.lfs.process=git-lfs filter-process
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	filter.lfs.required=true
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	credential.helper=manager
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	http.sslbackend=schannel
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	http.schannelusesslcainfo=false
+file:C:/Users/Rene/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/git/etc/gitconfig	credential.https://dev.azure.com.usehttppath=true
+file:C:/Users/Rene/.gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:C:/Users/Rene/.gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:C:/Users/Rene/.gitconfig	filter.lfs.process=git-lfs filter-process
+file:C:/Users/Rene/.gitconfig	filter.lfs.required=true
+file:C:/Users/Rene/.gitconfig	user.name=BeSiRe1
+file:C:/Users/Rene/.gitconfig	user.email=ReneWieland@web.de
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=false
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	core.symlinks=false
+file:.git/config	core.ignorecase=true
+file:.git/config	remote.origin.url=https://github.com/BeSiRe1/ioBroker.faikin.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+file:.git/config	credential.helper=manager
+file:.git/config	http.sslbackend=openssl
+command line:	safe.directory=C:\Users\Rene\Documents\Codex\2026-09-30\files-pasted-by-the-user-projekt\outputs\iobroker-faikin
+command line:	safe.directory=C:\Users\Rene\Documents\Codex\2026-09-30\files-pasted-by-the-user-projekt\outputs\iobroker-faikin/*
+
+
+------------
+Diagnostic: Credential storage
+Skipped: False
+Success: False
+Exception:
+System.Exception: Unable to persist credentials with the 'wincredman' credential store.
+See https://aka.ms/gcm/credstores for more information.
+   bei GitCredentialManager.CredentialStore.ValidateWindowsCredentialManager()
+   bei GitCredentialManager.CredentialStore.EnsureBackingStore()
+   bei GitCredentialManager.CredentialStore.Remove(String service, String account)
+   bei GitCredentialManager.Diagnostics.CredentialStoreDiagnostic.RunInternalAsync(StringBuilder log, IList`1 additionalFiles)
+   bei GitCredentialManager.Diagnostics.Diagnostic.<RunAsync>d__6.MoveNext()
+Log:
+ICredentialStore instance is of type: CredentialStore
+Writing test credential...Deleting test credential...
+------------
+Diagnostic: Microsoft authentication (AAD/MSA)
+Skipped: False
+Success: False
+Exception:
+System.UnauthorizedAccessException: Der Zugriff auf den Pfad "C:\Users\Rene\AppData\Local\.IdentityService" wurde verweigert.
+   bei System.IO.__Error.WinIOError(Int32 errorCode, String maybeFullPath)
+   bei System.IO.Directory.InternalCreateDirectory(String fullPath, String path, Object dirSecurityObj, Boolean checkHost)
+   bei System.IO.Directory.InternalCreateDirectoryHelper(String path, Boolean checkHost)
+   bei Microsoft.Identity.Client.Extensions.Msal.CrossPlatLock..ctor(String lockfilePath, Int32 lockFileRetryDelay, Int32 lockFileRetryCount)
+   bei Microsoft.Identity.Client.Extensions.Msal.MsalCacheHelper.CreateCrossPlatLock(StorageCreationProperties storageCreationProperties)
+   bei Microsoft.Identity.Client.Extensions.Msal.MsalCacheHelper.<CreateAsync>d__23.MoveNext()
+--- Ende der Stapelüberwachung vom vorhergehenden Ort, an dem die Ausnahme ausgelöst wurde ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitCredentialManager.Diagnostics.MicrosoftAuthenticationDiagnostic.<RunInternalAsync>d__1.MoveNext()
+--- Ende der Stapelüberwachung vom vorhergehenden Ort, an dem die Ausnahme ausgelöst wurde ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitCredentialManager.Diagnostics.Diagnostic.<RunAsync>d__6.MoveNext()
+Log:
+Broker is not enabled.
+Flow type is: Auto
+Gathering MSAL token cache data... OK
+CacheDirectory: C:\Users\Rene\AppData\Local\.IdentityService
+CacheFileName: msal.cache
+CacheFilePath: C:\Users\Rene\AppData\Local\.IdentityService\msal.cache
+Creating cache helper...
+------------
+Diagnostic: GitHub API
+Skipped: False
+Success: False
+Exception:
+System.Net.Http.HttpRequestException: Fehler beim Senden der Anforderung. ---> System.Net.WebException: Die zugrunde liegende Verbindung wurde geschlossen: Unbekannter Fehler beim Empfangen.. ---> System.ComponentModel.Win32Exception: Im Sicherheitspaket sind keine Anmeldeinformationen verfügbar
+   bei System.Net.SSPIWrapper.AcquireCredentialsHandle(SSPIInterface SecModule, String package, CredentialUse intent, SecureCredential2 scc)
+   bei System.Net.Security.SecureChannel.AcquireCredentialsHandle(CredentialUse credUsage, SecureCredential2& secureCredential)
+   bei System.Net.Security.SecureChannel.AcquireCredentialsHandle(CredentialUse credUsage, X509Certificate2 selectedCert, Flags flags)
+   bei System.Net.Security.SecureChannel.AcquireClientCredentials(Byte[]& thumbPrint)
+   bei System.Net.Security.SecureChannel.GenerateToken(Byte[] input, Int32 offset, Int32 count, Byte[]& output)
+   bei System.Net.Security.SecureChannel.NextMessage(Byte[] incoming, Int32 offset, Int32 count)
+   bei System.Net.Security.SslState.StartSendBlob(Byte[] incoming, Int32 count, AsyncProtocolRequest asyncRequest, Boolean renegotiation)
+   bei System.Net.Security.SslState.ForceAuthentication(Boolean receiveFirst, Byte[] buffer, AsyncProtocolRequest asyncRequest, Boolean renegotiation)
+   bei System.Net.Security.SslState.ProcessAuthentication(LazyAsyncResult lazyResult)
+   bei System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+   bei System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state, Boolean preserveSyncCtx)
+   bei System.Threading.ExecutionContext.Run(ExecutionContext executionContext, ContextCallback callback, Object state)
+   bei System.Net.TlsStream.ProcessAuthentication(LazyAsyncResult result)
+   bei System.Net.TlsStream.BeginWrite(Byte[] buffer, Int32 offset, Int32 size, AsyncCallback asyncCallback, Object asyncState)
+   bei System.Net.ConnectStream.WriteHeaders(Boolean async)
+   --- Ende der internen Ausnahmestapelüberwachung ---
+   bei System.Net.HttpWebRequest.EndGetResponse(IAsyncResult asyncResult)
+   bei System.Net.Http.HttpClientHandler.GetResponseCallback(IAsyncResult ar)
+   --- Ende der internen Ausnahmestapelüberwachung ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitHub.GitHubRestApi.<GetMetaInfoAsync>d__5.MoveNext()
+--- Ende der Stapelüberwachung vom vorhergehenden Ort, an dem die Ausnahme ausgelöst wurde ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitHub.Diagnostics.GitHubApiDiagnostic.<RunInternalAsync>d__2.MoveNext()
+--- Ende der Stapelüberwachung vom vorhergehenden Ort, an dem die Ausnahme ausgelöst wurde ---
+   bei System.Runtime.ExceptionServices.ExceptionDispatchInfo.Throw()
+   bei System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+   bei GitCredentialManager.Diagnostics.Diagnostic.<RunAsync>d__6.MoveNext()
+Log:
+Using 'https://github.com/' as API target.
+Querying '/meta' endpoint...
