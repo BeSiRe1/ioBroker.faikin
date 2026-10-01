@@ -1,6 +1,6 @@
 # Faikin
 
-An ioBroker adapter for Daikin air conditioners using Faikin/Faikout firmware. It contains its own MQTT broker, so Faikin modules can connect directly to this adapter. One adapter instance can accept several modules; each module needs a unique MQTT hostname.
+An ioBroker adapter for Daikin air conditioners using Faikin/Faikout firmware. It contains its own MQTT broker, so Faikin modules can connect directly to this adapter. One adapter instance can accept several modules. Each Faikin module needs a unique hostname, set under **WiFi settings** in the Faikin interface. Faikin uses this hostname for both DHCP and MQTT.
 
 > **Development status:** 0.1.3 is an initial development version. It needs installation and real-device testing before it should be used on a production ioBroker system.
 
@@ -31,7 +31,7 @@ This direct GitHub installation is for testing. Inclusion in the official ioBrok
 1. Choose a free MQTT port. The default is `1884`, which can coexist with a broker already using `1883`.
 2. Set a username and password; use the same credentials on every Faikin module.
 3. In each module's MQTT settings, enter the ioBroker server's LAN address, the configured port, and the credentials.
-4. Give each module a unique hostname. The adapter creates separate objects under `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands`, and `<hostname>.MQTT` when it receives that device's messages. General MQTT topics without a device hostname are stored in `General.MQTT`.
+4. Set a unique hostname for each module under **WiFi settings** in its Faikin interface. The adapter discovers each module by its MQTT hostname and creates separate objects under `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands`, and `<hostname>.MQTT`. General MQTT topics without a device hostname are stored in `General.MQTT`.
 
 The broker uses unencrypted MQTT and should only be reachable on a trusted local network. Do not forward its port from the internet. The fields each air conditioner reports depend on its model and firmware; newly received fields and topics are added automatically.
 
@@ -54,7 +54,7 @@ MIT. See [LICENSE](LICENSE).
 
 # Faikin (Deutsch)
 
-Ein ioBroker-Adapter für Daikin-Klimaanlagen mit Faikin-/Faikout-Firmware. Der Adapter enthält einen eigenen MQTT-Broker, mit dem sich die Module direkt verbinden. Eine Adapterinstanz kann mehrere Module aufnehmen; jedes benötigt einen eigenen MQTT-Hostnamen.
+Ein ioBroker-Adapter für Daikin-Klimaanlagen mit Faikin-/Faikout-Firmware. Der Adapter enthält einen eigenen MQTT-Broker, mit dem sich die Module direkt verbinden. Eine Adapterinstanz kann mehrere Module aufnehmen. Jedes Faikin-Modul benötigt einen eigenen Hostnamen. Dieser wird in der Faikin-Oberfläche unter **WiFi settings** festgelegt und von Faikin sowohl für DHCP als auch für MQTT verwendet.
 
 > **Entwicklungsstand:** Version 0.1.3 ist eine erste Entwicklungsversion. Vor dem produktiven Einsatz muss sie installiert und mit echten Geräten geprüft werden.
 
@@ -81,7 +81,7 @@ Die direkte GitHub-Installation dient zunächst zum Testen. Eine Aufnahme in die
 1. Einen freien MQTT-Port festlegen. Standard ist `1884`, damit ein bereits auf Port `1883` laufender Broker daneben laufen kann.
 2. Benutzername und Passwort setzen und dieselben Zugangsdaten in allen Faikin-Modulen eintragen.
 3. In jedem Faikin-MQTT-Menü die LAN-Adresse des ioBroker-Servers, den Port und die Zugangsdaten eintragen.
-4. Jedem Modul einen eigenen MQTT-Hostnamen geben. Für erkannte Geräte legt der Adapter unter `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands` und `<hostname>.MQTT` getrennte Objekte an. Allgemeine MQTT-Themen ohne Geräte-Hostname erscheinen unter `General.MQTT`.
+4. Weise jedem Modul in der Faikin-Oberfläche unter **WiFi settings** einen eindeutigen Hostnamen zu. Der Adapter erkennt jedes Modul anhand dieses MQTT-Hostnamens und legt dafür getrennte Objekte unter `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands` und `<hostname>.MQTT` an. Allgemeine MQTT-Themen ohne Geräte-Hostname erscheinen unter `General.MQTT`.
 
 Der Broker verwendet unverschlüsseltes MQTT und sollte nur im vertrauenswürdigen lokalen Netzwerk erreichbar sein. Den Port nicht aus dem Internet freigeben. Welche Werte das jeweilige Klimagerät meldet, hängt von Modell und Firmware ab; neu empfangene Felder und Themen werden automatisch ergänzt.
 
