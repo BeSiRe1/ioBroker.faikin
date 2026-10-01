@@ -5,21 +5,32 @@ const utils = require('@iobroker/adapter-core');
 const createBroker = require('aedes');
 
 const STATUS_LABELS = {
-    online: 'Online-Status', power: 'Ein/Aus', heat: 'Heizbetrieb aktiv', home: 'Raumtemperatur',
-    outside: 'Außentemperatur', liquid: 'Kühlmittel-Vorlauftemperatur', comp: 'Kompressorleistung',
+    online: 'Klimaanlage antwortet', power: 'Klimaanlage Ein/Aus', heat: 'Heizbetrieb aktiv', home: 'Raumtemperatur',
+    outside: 'Außentemperatur', liquid: 'Kühlmittel-Vorlauftemperatur', comp: 'Kompressorrate',
     fanrpm: 'Lüfterdrehzahl', mode: 'Betriebsmodus (Code)', mode_text: 'Betriebsmodus (Klartext)',
     temp: 'Solltemperatur', fan: 'Lüfterstufe (Code)', fan_text: 'Lüfterstufe (Klartext)',
-    anglev: 'Lamellenwinkel vertikal', hum: 'Luftfeuchtigkeit', Whoutside: 'Energieverbrauch gesamt',
+    anglev: 'Vertikaler Lamellenwinkel', hum: 'Raumluftfeuchtigkeit', Whoutside: 'Energieverbrauch gesamt',
     Whheating: 'Energieverbrauch Heizen', Whcooling: 'Energieverbrauch Kühlen', consumption: 'Leistungsaufnahme',
-    demand: 'Leistungsanforderung', swingh: 'Swing horizontal', swingv: 'Swing vertikal', econo: 'Economy-Modus',
-    powerful: 'Powerful-Modus', comfort: 'Comfort-Modus', streamer: 'Streamer', sensor: 'Bewegungssensor',
-    quiet: 'Silent-Modus', autor: 'Auto-Toleranz', autot: 'Auto-Zieltemperatur', auto0: 'Auto-Ausschaltzeit',
-    auto1: 'Auto-Einschaltzeit', autop: 'Auto-Power', autoe: 'Zeitautomatik aktiviert', ts: 'Zeitstempel',
-    protocol: 'Protokoll'
+    demand: 'Leistungsanforderung', swingh: 'Horizontales Schwingen', swingv: 'Vertikales Schwingen', econo: 'Economy-Modus',
+    powerful: 'Powerful-Modus', comfort: 'Comfort-Modus', streamer: 'Streamer-/Luftreinigungsfunktion', sensor: 'Sensorfunktion',
+    quiet: 'Quiet-/Leise-Modus', autor: 'Auto-Toleranz', autot: 'Auto-Zieltemperatur', auto0: 'Auto-Ausschaltzeit',
+    auto1: 'Auto-Einschaltzeit', autop: 'Auto-Power', autoe: 'Zeitautomatik aktiviert'
 };
+const INFO_LABELS = {
+    app: 'Anwendungsname', bssid: 'WLAN-BSSID', build: 'Firmware-Build', 'build-suffix': 'Firmware-Build-Zusatz',
+    chan: 'WLAN-Kanal', control: 'Externe/automatische Steuerung aktiv', heat: 'Heizbetrieb aktiv',
+    ipv4: 'IPv4-Adresse', ipv6: 'IPv6-Adresse', protocol: 'Kommunikationsprotokoll',
+    ts: 'Zeitstempel (Faikin)', rssi: 'WLAN-Signalstärke (dBm)', ssid: 'WLAN-Name (SSID)',
+    uptime: 'Betriebszeit (Sekunden)', version: 'Firmware-Version'
+};
+const UNVERIFIED_INFO_LABELS = {
+    up: 'Up-Wert (Rohwert)', 'mqtt-up': 'MQTT-Verbindungswert (Rohwert)', flash: 'Flash-Wert (Rohwert)',
+    id: 'Modulkennung (Rohwert)', mem: 'Speicherwert (Rohwert)', rst: 'Neustartcode (Rohwert)', spi: 'SPI-Wert (Rohwert)'
+};
+const UNVERIFIED_INFO_FIELDS = new Set(Object.keys(UNVERIFIED_INFO_LABELS));
 const ID_MAP = {
-    online: 'Online', home: 'Raumtemperatur', outside: 'Aussentemperatur', liquid: 'Kuehlmittelvorlauf', comp: 'Kompressorleistung',
-    fanrpm: 'Luefterdrehzahl', mode: 'Betriebsmodus', temp: 'Solltemperatur', fan: 'Luefterstufe',
+    online: 'KlimaanlageAntwortet', home: 'Raumtemperatur', outside: 'Aussentemperatur', liquid: 'Kuehlmittelvorlauf', comp: 'Kompressorrate',
+    fanrpm: 'Luefterdrehzahl', mode: 'Betriebsmodus', temp: 'Solltemperatur', fan: 'Luefterstufe', hum: 'Raumluftfeuchtigkeit',
     anglev: 'Lamellenwinkel_vertikal', Whoutside: 'Energieverbrauch_Gesamt', Whheating: 'Energieverbrauch_Heizen',
     Whcooling: 'Energieverbrauch_Kuehlen', consumption: 'Leistungsaufnahme', demand: 'Leistungsanforderung',
     swingh: 'Swing_horizontal', swingv: 'Swing_vertikal', econo: 'Economy_Modus', powerful: 'Powerful_Modus',
@@ -80,7 +91,9 @@ class FaikinAdapter extends utils.Adapter {
         const legacyId = this.rootFor(legacyHostname);
         const legacyObject = await this.getObjectAsync(legacyId);
         if (!legacyObject || legacyObject.type !== 'device') return;
-        const onlineState = await this.getStateAsync(`${legacyId}.Status.Online`);
+        const onlineState = await this.getStateAsync(`${legacyId}.Status.Online`)
+            || await this.getStateAsync(`${legacyId}.Status.FaikinModulErreichbar`)
+            || await this.getStateAsync(`${legacyId}.Status.KlimaanlageAntwortet`);
         if (!onlineState) await this.delObjectAsync(legacyId, { recursive: true });
     }
 
@@ -107,11 +120,17 @@ class FaikinAdapter extends utils.Adapter {
         this.deviceRoots.set(hostname, deviceId);
         this.rootHosts.set(deviceId, hostname);
         await this.setObjectNotExistsAsync(deviceId, {
-            type: 'device', common: { name: hostname, statusStates: { onlineId: 'Status.Online' } }, native: {}
+            type: 'device', common: { name: hostname, statusStates: { onlineId: 'Status.FaikinModulErreichbar' } }, native: {}
         });
-        await this.extendObjectAsync(deviceId, { common: { statusStates: { onlineId: 'Status.Online' } } });
+        await this.extendObjectAsync(deviceId, { common: { statusStates: { onlineId: 'Status.FaikinModulErreichbar' } } });
         await this.setObjectNotExistsAsync(`${deviceId}.Status`, {
             type: 'channel', common: { name: 'Status' }, native: {}
+        });
+        await this.setObjectNotExistsAsync(`${deviceId}.Info`, {
+            type: 'channel', common: { name: 'Info' }, native: {}
+        });
+        await this.setObjectNotExistsAsync(`${deviceId}.Info.Unverified`, {
+            type: 'channel', common: { name: 'Unverified' }, native: {}
         });
         await this.setObjectNotExistsAsync(`${deviceId}.Control`, {
             type: 'channel', common: { name: 'Control' }, native: {}
@@ -122,8 +141,17 @@ class FaikinAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync(`${deviceId}.MQTT`, {
             type: 'channel', common: { name: 'MQTT-Nachrichten' }, native: {}
         });
-        await this.setObjectNotExistsAsync(`${deviceId}.Status.Online`, { type: 'state', common: { name: 'Online-Status Klimaanlage', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
-        await this.extendObjectAsync(`${deviceId}.Status.Online`, { common: { role: 'indicator.reachable' } });
+        await this.delObjectAsync(`${deviceId}.MQTT.info`, { recursive: true });
+        await this.delObjectAsync(`${deviceId}.Status.Protokoll`, { recursive: true });
+        await this.delObjectAsync(`${deviceId}.Status.Zeitstempel`, { recursive: true });
+        await this.delObjectAsync(`${deviceId}.Status.protocol`, { recursive: true });
+        await this.delObjectAsync(`${deviceId}.Status.ts`, { recursive: true });
+        await this.setObjectNotExistsAsync(`${deviceId}.Status.FaikinModulErreichbar`, { type: 'state', common: { name: 'Faikin-Modul erreichbar', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
+        await this.extendObjectAsync(`${deviceId}.Status.FaikinModulErreichbar`, { common: { name: 'Faikin-Modul erreichbar', role: 'indicator.reachable' } });
+        await this.setObjectNotExistsAsync(`${deviceId}.Status.KlimaanlageAntwortet`, { type: 'state', common: { name: STATUS_LABELS.online, type: 'boolean', role: 'indicator', read: true, write: false }, native: {} });
+        await this.extendObjectAsync(`${deviceId}.Status.KlimaanlageAntwortet`, { common: { name: STATUS_LABELS.online } });
+        await this.delObjectAsync(`${deviceId}.Status.Online`, { recursive: true });
+        await this.migrateUnverifiedValues(deviceId);
 
         const controls = [
             ['SetPower', 'Klimaanlage Ein/Aus', 'boolean', 'switch', false],
@@ -178,6 +206,36 @@ class FaikinAdapter extends utils.Adapter {
         await this.delObjectAsync(`${deviceId}.Steuerung`, { recursive: true });
     }
 
+    async migrateUnverifiedValues(deviceId) {
+        for (const key of UNVERIFIED_INFO_FIELDS) {
+            for (const oldId of [
+                `${deviceId}.Info.Unbestaetigt.${key}`,
+                `${deviceId}.Info.${key}`,
+                `${deviceId}.Status.${key}`
+            ]) {
+                const oldObject = await this.getObjectAsync(oldId);
+                if (!oldObject) continue;
+                const oldState = await this.getStateAsync(oldId);
+                if (oldState) {
+                    await this.writeValue(`${deviceId}.Info.Unverified.${key}`, oldState.val, UNVERIFIED_INFO_LABELS[key]);
+                }
+                await this.delObjectAsync(oldId, { recursive: true });
+            }
+        }
+        for (const key of ['hum', 'power', 'heat']) {
+            const oldId = `${deviceId}.Info.${key}`;
+            const oldObject = await this.getObjectAsync(oldId);
+            if (!oldObject) continue;
+            const oldState = await this.getStateAsync(oldId);
+            if (oldState) {
+                const targetId = `${deviceId}.Status.${ID_MAP[key] || key}`;
+                await this.writeValue(targetId, oldState.val, STATUS_LABELS[key], UNITS[key]);
+            }
+            await this.delObjectAsync(oldId, { recursive: true });
+        }
+        await this.delObjectAsync(`${deviceId}.Info.Unbestaetigt`, { recursive: true });
+    }
+
     async startBroker() {
         const port = Number(this.config.port);
         if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error(`Ungültiger MQTT-Port: ${this.config.port}`);
@@ -226,11 +284,11 @@ class FaikinAdapter extends utils.Adapter {
         const devicePrefix = hostname ? `state/${hostname}` : null;
         if (devicePrefix && (topic === devicePrefix || topic === `${devicePrefix}/status`)) {
             if (payload === 'true' || payload === 'false') {
-                await this.setStateAsync(`${root}.Status.Online`, payload === 'true', true);
+                await this.setStateAsync(`${root}.Status.FaikinModulErreichbar`, payload === 'true', true);
                 return;
             }
             if (payload === this.lastStatusPayload.get(hostname)) return;
-            await this.setStateAsync(`${root}.Status.Online`, true, true);
+            await this.setStateAsync(`${root}.Status.FaikinModulErreichbar`, true, true);
             let data;
             try { data = JSON.parse(payload); } catch { data = payload; }
             if (data && typeof data === 'object' && !Array.isArray(data)) {
@@ -245,9 +303,13 @@ class FaikinAdapter extends utils.Adapter {
         }
         if (devicePrefix && topic.startsWith(`${devicePrefix}/`)) {
             const key = topic.slice(devicePrefix.length + 1).replaceAll('/', '.');
-            await this.setStateAsync(`${root}.Status.Online`, true, true);
+            await this.setStateAsync(`${root}.Status.FaikinModulErreichbar`, true, true);
             if (key === 'online') {
-                await this.setStateAsync(`${root}.Status.Online`, this.parseValue(payload) === true, true);
+                await this.writeStatusValue(hostname, key, this.parseValue(payload));
+                return;
+            }
+            if (['hum', 'power', 'heat', 'up', 'mqtt-up', 'protocol', 'ts'].includes(key)) {
+                await this.writeStatusValue(hostname, key, this.parseValue(payload));
                 return;
             }
             await this.writeValue(`${root}.Status.${key}`, this.parseValue(payload), STATUS_LABELS[key] || key);
@@ -257,8 +319,18 @@ class FaikinAdapter extends utils.Adapter {
         for (const family of hostname ? families : []) {
             const prefix = `${family}/${hostname}`;
             if (topic === prefix || topic.startsWith(`${prefix}/`)) {
-                const name = `${family}.${topic.slice(prefix.length).replace(/^\//, '').replaceAll('/', '.') || 'message'}`;
-                await this.writeValue(`${root}.MQTT.${name}`, this.parseValue(payload), topic);
+                const suffix = topic.slice(prefix.length).replace(/^\//, '').replaceAll('/', '.') || 'message';
+                if (family === 'info') {
+                    const statusKey = suffix.split('.').pop();
+                    if (['hum', 'power', 'heat', 'up', 'mqtt-up'].includes(statusKey)) {
+                        await this.writeStatusValue(hostname, statusKey, this.parseValue(payload));
+                        return;
+                    }
+                    await this.writeInfoValue(hostname, suffix, this.parseValue(payload), topic);
+                } else {
+                    const name = `${family}.${suffix}`;
+                    await this.writeValue(`${root}.MQTT.${name}`, this.parseValue(payload), topic);
+                }
                 return;
             }
         }
@@ -285,6 +357,14 @@ class FaikinAdapter extends utils.Adapter {
     }
 
     async writeStatusValue(hostname, key, value) {
+        if (key === 'protocol' || key === 'ts') {
+            await this.writeInfoValue(hostname, key, value);
+            return;
+        }
+        if (UNVERIFIED_INFO_FIELDS.has(key)) {
+            await this.writeInfoValue(hostname, key, value);
+            return;
+        }
         const root = this.rootFor(hostname);
         const idName = ID_MAP[key] || key.replace(/[^a-zA-Z0-9_-]/g, '_');
         const label = STATUS_LABELS[key] || key;
@@ -309,11 +389,24 @@ class FaikinAdapter extends utils.Adapter {
         }
     }
 
+    async writeInfoValue(hostname, key, value, topic) {
+        const root = this.rootFor(hostname);
+        const parts = key.split('.');
+        const safeId = parts.map(part => part.replace(/[^a-zA-Z0-9_-]/g, '_')).join('.');
+        const finalKey = parts[parts.length - 1];
+        const mappedId = key === 'protocol' || key === 'ts' ? ID_MAP[key] : safeId;
+        const isUnverified = UNVERIFIED_INFO_FIELDS.has(finalKey);
+        const id = `${root}.Info${isUnverified ? '.Unverified' : ''}.${mappedId}`;
+        const name = UNVERIFIED_INFO_LABELS[finalKey] || INFO_LABELS[key] || INFO_LABELS[finalKey] || topic || key;
+        await this.writeValue(id, value, name);
+    }
+
     async writeValue(id, value, name, unit) {
         const type = typeof value === 'boolean' ? 'boolean' : typeof value === 'number' ? 'number' : 'string';
         let common = { name: name || id.split('.').pop(), type, role: type === 'boolean' ? 'indicator' : type === 'number' ? 'value' : 'text', read: true, write: false };
         if (unit) common.unit = unit;
         await this.setObjectNotExistsAsync(id, { type: 'state', common, native: {} });
+        await this.extendObjectAsync(id, { common: { name: common.name } });
         const current = await this.getStateAsync(id);
         if (!current || current.val !== value || current.ack !== true) await this.setStateAsync(id, value, true);
     }
