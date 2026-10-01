@@ -64,15 +64,15 @@
         "admin": ">=4.0.9"
       }
     ],
-    "encryptedNative": [
-      "password"
-    ],
-    "protectedNative": [
-      "password"
-    ],
     "extIcon": "https://raw.githubusercontent.com/BeSiRe1/ioBroker.faikin/main/admin/faikin.svg",
     "tier": 3
   },
+  "encryptedNative": [
+    "password"
+  ],
+  "protectedNative": [
+    "password"
+  ],
   "native": {
     "port": 1884,
     "bind": "0.0.0.0",
