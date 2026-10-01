@@ -4,16 +4,12 @@
     "version": "0.1.3",
     "news": {
       "0.1.3": {
-        "en": "Group Faikin info values in Info, separate confirmed module reachability from air-conditioner response, collect undocumented raw values in Info.Unverified, keep energy counters in Status, and clarify datapoint labels.",
-        "de": "Faikin-Info-Werte in Info sammeln, Modul-Erreichbarkeit und Antwort der Klimaanlage trennen, nicht dokumentierte Rohwerte unter Info.Unverified sammeln, Energieverbrauchswerte in Status belassen und Datenpunktnamen präzisieren."
+        "en": "Group Faikin, Wi-Fi, and undocumented raw values in Info, separate module reachability from air-conditioner response, keep energy counters and heating activity in Status, and clarify datapoint labels.",
+        "de": "Faikin-, WLAN- und nicht dokumentierte Rohwerte direkt in Info sammeln, Modul-Erreichbarkeit und Antwort der Klimaanlage trennen, Energieverbrauch und Heizstatus in Status belassen und Datenpunktnamen präzisieren."
       },
       "0.1.2": {
         "en": "Subscribe to control states and map incoming online status to the dedicated device state.",
         "de": "Steuerungszustände abonnieren und den empfangenen Online-Status dem Geräte-Statuspunkt zuordnen."
-      },
-      "0.1.1": {
-        "en": "Use a generic default hostname for general MQTT topics.",
-        "de": "Neutralen Standard-Hostname für allgemeine MQTT-Themen verwenden."
       },
       "0.1.0": {
         "en": "Initial adapter implementation with an embedded MQTT broker, Faikin status objects, controls and generic MQTT access.",
