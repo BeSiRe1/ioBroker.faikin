@@ -8,7 +8,7 @@
 - Group Faikin `info/<hostname>/...` data in a separate `Info` channel and give known fields descriptive names.
 - Place the reported humidity, power, and heating activity values in the device's `Status` channel.
 - Move protocol and device timestamp to `Info`; show module reachability and air-conditioner response separately in `Status`.
-- Route application, firmware, Wi-Fi, network, runtime, and undocumented raw values directly to `Info`; distinguish module reachability from the air conditioner response state; keep energy counters and heating activity in `Status`; clarify datapoint labels.
+- Route application, firmware, Wi-Fi, network, runtime, and undocumented raw values directly to `Info`; distinguish module reachability from the air conditioner response state; keep energy counters and heating activity in `Status`.
 
 ## 0.1.2 (2026-10-01)
 

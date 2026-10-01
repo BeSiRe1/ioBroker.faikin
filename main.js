@@ -32,7 +32,8 @@ const INFO_RAW_LABELS = {
 };
 const INFO_RAW_FIELDS = new Set(Object.keys(INFO_RAW_LABELS));
 const ID_MAP = {
-    online: 'KlimaanlageAntwortet', home: 'Raumtemperatur', outside: 'Aussentemperatur', liquid: 'Kuehlmittelvorlauf', comp: 'Kompressorrate',
+    online: 'KlimaanlageAntwortet', power: 'Betriebszustand', heat: 'Heizbetrieb', home: 'Raumtemperatur',
+    outside: 'Aussentemperatur', liquid: 'Kuehlmittelvorlauf', comp: 'Kompressorrate',
     fanrpm: 'Luefterdrehzahl', mode: 'Betriebsmodus', temp: 'Solltemperatur', fan: 'Luefterstufe', hum: 'Raumluftfeuchtigkeit',
     anglev: 'Lamellenwinkel_vertikal', Whoutside: 'Energieverbrauch_Gesamt', Whheating: 'Energieverbrauch_Heizen',
     Whcooling: 'Energieverbrauch_Kuehlen', consumption: 'Leistungsaufnahme', demand: 'Leistungsanforderung',
