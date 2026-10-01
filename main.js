@@ -33,6 +33,7 @@ const UNITS = {
 };
 const MODES = { H: 'Heizen', C: 'Kühlen', A: 'Auto', D: 'Trocknen', F: 'Nur Lüfter' };
 const FANS = { A: 'Auto', Q: 'Nacht/Leise', '1': 'Stufe 1', '2': 'Stufe 2', '3': 'Stufe 3', '4': 'Stufe 4', '5': 'Stufe 5' };
+const GENERAL_FOLDER = 'General';
 const CONTROL_TO_FIELD = {
     SetPower: 'power', SetTemperature: 'temp', SetMode: 'mode', SetFan: 'fan', SetSwingHorizontal: 'swingh',
     SetSwingVertical: 'swingv', SetPowerful: 'powerful', SetEcono: 'econo', SetComfort: 'comfort',
@@ -41,7 +42,7 @@ const CONTROL_TO_FIELD = {
 };
 const FIELD_TO_CONTROL = Object.fromEntries(Object.entries(CONTROL_TO_FIELD).map(([control, field]) => [field, control]));
 const DEFAULTS = {
-    port: 1884, bind: '0.0.0.0', hostname: 'Faikin', username: '', password: ''
+    port: 1884, bind: '0.0.0.0', username: '', password: ''
 };
 
 class FaikinAdapter extends utils.Adapter {
@@ -60,7 +61,6 @@ class FaikinAdapter extends utils.Adapter {
         this.on('unload', callback => this.onUnload(callback));
     }
 
-    get hostname() { return String(this.config.hostname || DEFAULTS.hostname).trim(); }
     rootFor(hostname) { return hostname.replace(/[^a-zA-Z0-9_-]/g, '_'); }
 
     async onReady() {
@@ -68,13 +68,32 @@ class FaikinAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync('info', { type: 'channel', common: { name: 'Information' }, native: {} });
         await this.setObjectNotExistsAsync('info.connection', { type: 'state', common: { name: 'MQTT-Client verbunden', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
         await this.setStateAsync('info.connection', false, true);
-        await this.createObjects();
+        await this.removeEmptyLegacyDefaultDevice();
+        await this.createGeneralFolder();
         this.subscribeStates('*');
         await this.startBroker();
         this.log.info(`Faikin-MQTT-Broker lauscht auf ${this.config.bind}:${this.config.port}; automatische Geräteerkennung aktiv.`);
     }
 
-    createObjects(hostname = this.hostname) {
+    async removeEmptyLegacyDefaultDevice() {
+        const legacyHostname = String(this.config.hostname || 'Faikin').trim();
+        const legacyId = this.rootFor(legacyHostname);
+        const legacyObject = await this.getObjectAsync(legacyId);
+        if (!legacyObject || legacyObject.type !== 'device') return;
+        const onlineState = await this.getStateAsync(`${legacyId}.Status.Online`);
+        if (!onlineState) await this.delObjectAsync(legacyId, { recursive: true });
+    }
+
+    async createGeneralFolder() {
+        await this.setObjectNotExistsAsync(GENERAL_FOLDER, {
+            type: 'folder', common: { name: 'General MQTT topics' }, native: {}
+        });
+        await this.setObjectNotExistsAsync(`${GENERAL_FOLDER}.MQTT`, {
+            type: 'channel', common: { name: 'MQTT-Nachrichten' }, native: {}
+        });
+    }
+
+    createObjects(hostname) {
         const pending = this.deviceSetups.get(hostname);
         if (pending) return pending;
         const setup = this.createDeviceObjects(hostname);
@@ -201,11 +220,11 @@ class FaikinAdapter extends utils.Adapter {
     async handleIncoming(topic, payload) {
         const parts = topic.split('/');
         const topicFamilies = ['state', 'setting', 'command', 'info', 'event', 'error', 'Faikout'];
-        const hostname = topicFamilies.includes(parts[0]) && parts.length > 1 ? parts[1] : this.hostname;
-        await this.createObjects(hostname);
-        const root = this.rootFor(hostname);
-        const devicePrefix = `state/${hostname}`;
-        if (topic === devicePrefix || topic === `${devicePrefix}/status`) {
+        const hostname = topicFamilies.includes(parts[0]) && parts.length > 1 ? parts[1] : null;
+        if (hostname) await this.createObjects(hostname);
+        const root = hostname ? this.rootFor(hostname) : GENERAL_FOLDER;
+        const devicePrefix = hostname ? `state/${hostname}` : null;
+        if (devicePrefix && (topic === devicePrefix || topic === `${devicePrefix}/status`)) {
             if (payload === 'true' || payload === 'false') {
                 await this.setStateAsync(`${root}.Status.Online`, payload === 'true', true);
                 return;
@@ -224,7 +243,7 @@ class FaikinAdapter extends utils.Adapter {
             }
             return;
         }
-        if (topic.startsWith(`${devicePrefix}/`)) {
+        if (devicePrefix && topic.startsWith(`${devicePrefix}/`)) {
             const key = topic.slice(devicePrefix.length + 1).replaceAll('/', '.');
             await this.setStateAsync(`${root}.Status.Online`, true, true);
             if (key === 'online') {
@@ -234,9 +253,8 @@ class FaikinAdapter extends utils.Adapter {
             await this.writeValue(`${root}.Status.${key}`, this.parseValue(payload), STATUS_LABELS[key] || key);
             return;
         }
-        if (topic === `state/${this.hostname}`) return;
         const families = ['info', 'event', 'error', 'Faikout'];
-        for (const family of families) {
+        for (const family of hostname ? families : []) {
             const prefix = `${family}/${hostname}`;
             if (topic === prefix || topic.startsWith(`${prefix}/`)) {
                 const name = `${family}.${topic.slice(prefix.length).replace(/^\//, '').replaceAll('/', '.') || 'message'}`;
@@ -244,7 +262,7 @@ class FaikinAdapter extends utils.Adapter {
                 return;
             }
         }
-        if (topic.startsWith('setting/')) {
+        if (hostname && topic.startsWith('setting/')) {
             const prefix = `setting/${hostname}`;
             if (topic === prefix || topic.startsWith(`${prefix}/`)) {
                 const suffix = topic.slice(prefix.length).replace(/^\//, '').replaceAll('/', '.') || 'Current';

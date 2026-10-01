@@ -4,6 +4,7 @@
 
 - Show device reachability in the object tree using the built-in status indicator.
 - Separate writable controls and one-time commands into `Control` and `Commands` object folders.
+- Store MQTT topics without a device hostname in a fixed `General` folder instead of creating a pseudo-device.
 
 ## 0.1.2 (2026-10-01)
 

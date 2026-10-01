@@ -4,8 +4,8 @@
     "version": "0.1.3",
     "news": {
       "0.1.3": {
-        "en": "Separate writable controls and one-time commands into clear object folders, and show device reachability in the object tree.",
-        "de": "Bedienbare Steuerungen und einmalige Befehle in eindeutige Objektordner trennen und die Geräte-Erreichbarkeit im Objektbaum anzeigen."
+        "en": "Separate writable controls and one-time commands into clear folders, show device reachability, and store general MQTT topics in a General folder.",
+        "de": "Bedienbare Steuerungen und einmalige Befehle in eindeutige Ordner trennen, Geräte-Erreichbarkeit anzeigen und allgemeine MQTT-Themen im Ordner General speichern."
       },
       "0.1.2": {
         "en": "Subscribe to control states and map incoming online status to the dedicated device state.",
@@ -72,7 +72,6 @@
   "native": {
     "port": 1884,
     "bind": "0.0.0.0",
-    "hostname": "Faikin",
     "username": "",
     "password": ""
   }

@@ -49,23 +49,6 @@
       "md": 6,
       "lg": 6
     },
-    "_topicsHeader": {
-      "newLine": true,
-      "type": "header",
-      "text": "Geräte und MQTT-Themen",
-      "size": 3,
-      "sm": 12
-    },
-    "hostname": {
-      "newLine": true,
-      "type": "text",
-      "label": "Standard-Hostname für allgemeine MQTT-Themen",
-      "default": "Faikin",
-      "help": "Jedes Faikin-Modul wird anhand seines eigenen MQTT-Hostnamens als Gerät angelegt.",
-      "sm": 12,
-      "md": 8,
-      "lg": 6
-    },
     "_setupHeader": {
       "newLine": true,
       "type": "header",
@@ -76,7 +59,7 @@
     "_helpText": {
       "newLine": true,
       "type": "staticText",
-      "text": "In jedem Faikin-MQTT-Menü als Host die IP-Adresse des ioBroker-Servers und als Port den oben eingestellten Port eintragen. Bei gesetzten Zugangsdaten dieselben Werte in allen Modulen eintragen. Jedes Modul braucht einen eigenen MQTT-Hostname; erkannte Geräte und ihre Datenpunkte werden automatisch angelegt. Der Port muss auf dem ioBroker-Server frei und im lokalen Netzwerk erreichbar sein.",
+      "text": "In jedem Faikin-MQTT-Menü als Host die IP-Adresse des ioBroker-Servers und als Port den oben eingestellten Port eintragen. Bei gesetzten Zugangsdaten dieselben Werte in allen Modulen eintragen. Jedes Modul braucht einen eigenen MQTT-Hostname; erkannte Geräte und ihre Datenpunkte werden automatisch angelegt. Allgemeine MQTT-Themen ohne Geräte-Hostname erscheinen im Ordner General. Der Port muss auf dem ioBroker-Server frei und im lokalen Netzwerk erreichbar sein.",
       "sm": 12
     }
   }
