@@ -21,7 +21,7 @@
       "de": "Steuert und überwacht Faikin/Faikout-Klimaanlagen über einen integrierten MQTT-Broker."
     },
     "authors": [
-      "Rene"
+      "BeSiRe1"
     ],
     "licenseInformation": {
       "license": "MIT",
