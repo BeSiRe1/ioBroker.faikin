@@ -2,18 +2,17 @@
 
 ## 0.1.3 (2026-10-01)
 
-- Show device reachability in the object tree using the built-in status indicator.
-- Separate writable controls and one-time commands into `Control` and `Commands` object folders.
-- Store MQTT topics without a device hostname in the fixed `General` folder.
-- Group Faikin `info/<hostname>/...` data in a separate `Info` channel and give known fields descriptive names.
-- Place the reported humidity, power, and heating activity values in the device's `Status` channel.
-- Move protocol and device timestamp to `Info`; show module reachability and air-conditioner response separately in `Status`.
-- Route application, firmware, Wi-Fi, network, runtime, and undocumented raw values directly to `Info`; distinguish module reachability from the air conditioner response state; keep energy counters and heating activity in `Status`.
+- Distinguish Faikin module reachability from air-conditioner reachability.
+- Separate controls from one-time commands and collect MQTT topics without a device hostname under `General`.
 
 ## 0.1.2 (2026-10-01)
 
-- Subscribe to writable control states so commands are processed.
-- Map incoming online status to the dedicated device online state.
+- Subscribe to writable control states and send their changes through MQTT.
+- Process the air-conditioner status reported by Faikin.
+
+## 0.1.1 (2026-09-30)
+
+- Add a configurable MQTT bind address and port, with optional authentication.
 
 ## 0.1.0 (2026-09-30)
 
