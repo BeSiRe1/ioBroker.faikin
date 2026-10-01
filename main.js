@@ -5,16 +5,18 @@ const utils = require('@iobroker/adapter-core');
 const createBroker = require('aedes');
 
 const STATUS_LABELS = {
-    online: 'Klimaanlage erreichbar', power: 'Klimaanlage Ein/Aus', heat: 'Heizmodus aktiv', home: 'Raumtemperatur',
-    outside: 'Außentemperatur', liquid: 'Kühlmittel-Vorlauftemperatur', comp: 'Kompressorrate',
-    fanrpm: 'Lüfterdrehzahl', mode: 'Betriebsmodus (Code)', mode_text: 'Betriebsmodus (Klartext)',
-    temp: 'Solltemperatur', fan: 'Lüfterstufe (Code)', fan_text: 'Lüfterstufe (Klartext)',
-    anglev: 'Vertikaler Lamellenwinkel', hum: 'Raumluftfeuchtigkeit', Whoutside: 'Energieverbrauch gesamt',
-    Whheating: 'Energieverbrauch Heizen', Whcooling: 'Energieverbrauch Kühlen', consumption: 'Leistungsaufnahme',
-    demand: 'Leistungsanforderung', swingh: 'Horizontales Schwingen', swingv: 'Vertikales Schwingen', econo: 'Economy-Modus',
-    powerful: 'Powerful-Modus', comfort: 'Comfort-Modus', streamer: 'Streamer-/Luftreinigungsfunktion', sensor: 'Sensorfunktion',
-    quiet: 'Quiet-/Leise-Modus', autor: 'Auto-Toleranz', autot: 'Auto-Zieltemperatur', auto0: 'Auto-Ausschaltzeit',
-    auto1: 'Auto-Einschaltzeit', autop: 'Auto-Power', autoe: 'Zeitautomatik aktiviert'
+    online: 'Klimaanlage erreichbar', power: 'Klimaanlage Ein/Aus', heat: 'Heizbetrieb aktiv', home: 'Raumtemperatur',
+    outside: 'Außentemperatur', liquid: 'Kühlmittel-Vorlauftemperatur', inlet: 'Ansauglufttemperatur',
+    comp: 'Kompressorfrequenz', fanrpm: 'Lüfterdrehzahl', mode: 'Betriebsmodus (Code)', mode_text: 'Betriebsmodus',
+    temp: 'Solltemperatur', fan: 'Lüfterstufe (Code)', fan_text: 'Lüfterstufe', anglev: 'Vertikaler Lamellenwinkel',
+    hum: 'Raumluftfeuchtigkeit', Whoutside: 'Energieverbrauch gesamt', Whheating: 'Energieverbrauch Heizen',
+    Whcooling: 'Energieverbrauch Kühlen', consumption: 'Leistungsaufnahme', demand: 'Leistungsanforderung',
+    swingh: 'Horizontales Schwingen', swingv: 'Vertikales Schwingen', econo: 'Energiesparmodus',
+    powerful: 'Powerful-Modus', comfort: 'Comfort-Modus', streamer: 'Streamer-/Luftreinigungsfunktion',
+    sensor: 'Sensorfunktion', quiet: 'Quiet-/Leise-Modus', autor: 'Auto-Toleranz', autot: 'Auto-Zieltemperatur',
+    auto0: 'Auto-Ausschaltzeit', auto1: 'Auto-Einschaltzeit', autop: 'Automatisches Ein/Aus',
+    autoe: 'Automatik aktiviert', env: 'Referenztemperatur', slave: 'Heiz-/Kühlmodus nicht führend',
+    antifreeze: 'Frostschutzbetrieb aktiv', model: 'Klimaanlagenmodell'
 };
 const INFO_LABELS = {
     app: 'Anwendungsname', bssid: 'WLAN-BSSID', build: 'Firmware-Buildzeit', 'build-suffix': 'Firmware-Buildvariante',
@@ -39,17 +41,23 @@ const INFO_ID_MAP = {
     flash: 'flash_value', id: 'module_id', mem: 'memory_value', rst: 'restart_code', spi: 'spi_value'
 };
 const ID_MAP = {
-    online: 'air_conditioner_reachable', power: 'power', heat: 'heat', home: 'home', outside: 'outside',
-    liquid: 'liquid', comp: 'comp', fanrpm: 'fanrpm', mode: 'mode', mode_text: 'mode_text', temp: 'temp',
-    fan: 'fan', fan_text: 'fan_text', hum: 'hum', anglev: 'anglev', Whoutside: 'whoutside',
-    Whheating: 'whheating', Whcooling: 'whcooling', consumption: 'consumption', demand: 'demand',
-    swingh: 'swingh', swingv: 'swingv', econo: 'econo', powerful: 'powerful', comfort: 'comfort',
-    streamer: 'streamer', sensor: 'sensor', quiet: 'quiet', autor: 'autor', autot: 'autot',
-    auto0: 'auto0', auto1: 'auto1', autop: 'autop', autoe: 'autoe', ts: 'timestamp', protocol: 'protocol'
+    online: 'air_conditioner_reachable', power: 'power', heat: 'heating_active', home: 'room_temperature',
+    outside: 'outside_temperature', liquid: 'coolant_feed_temperature', inlet: 'intake_air_temperature',
+    comp: 'compressor_frequency', fanrpm: 'fan_speed_rpm', mode: 'operating_mode', mode_text: 'operating_mode_text',
+    temp: 'target_temperature', fan: 'fan_level', fan_text: 'fan_level_text', hum: 'humidity',
+    anglev: 'vertical_louvre_angle', Whoutside: 'energy_consumption_total',
+    Whheating: 'energy_consumption_heating', Whcooling: 'energy_consumption_cooling',
+    consumption: 'power_consumption', demand: 'power_demand', swingh: 'horizontal_swing',
+    swingv: 'vertical_swing', econo: 'economy_mode', powerful: 'powerful_mode', comfort: 'comfort_mode',
+    streamer: 'streamer', sensor: 'sensor_function', quiet: 'quiet_mode', autor: 'auto_tolerance',
+    autot: 'auto_target_temperature', auto0: 'auto_off_time', auto1: 'auto_on_time',
+    autop: 'automatic_power', autoe: 'automation_enabled', env: 'reference_temperature',
+    slave: 'slave', antifreeze: 'antifreeze_mode', model: 'air_conditioner_model', ts: 'timestamp', protocol: 'protocol'
 };
 const UNITS = {
-    home: '°C', outside: '°C', liquid: '°C', temp: '°C', autot: '°C', hum: '%', demand: '%', rssi: 'dBm', uptime: 's',
-    fanrpm: 'U/min', anglev: '°', Whoutside: 'Wh', Whheating: 'Wh', Whcooling: 'Wh', consumption: 'W'
+    home: '°C', outside: '°C', liquid: '°C', inlet: '°C', temp: '°C', autot: '°C', autor: '°C', env: '°C',
+    comp: 'Hz', hum: '%', demand: '%', rssi: 'dBm', uptime: 's', fanrpm: 'U/min', anglev: '°',
+    Whoutside: 'Wh', Whheating: 'Wh', Whcooling: 'Wh', consumption: 'W'
 };
 const MODES = { H: 'Heizen', C: 'Kühlen', A: 'Auto', D: 'Trocknen', F: 'Nur Lüfter' };
 const FANS = { A: 'Auto', Q: 'Nacht/Leise', '1': 'Stufe 1', '2': 'Stufe 2', '3': 'Stufe 3', '4': 'Stufe 4', '5': 'Stufe 5' };
