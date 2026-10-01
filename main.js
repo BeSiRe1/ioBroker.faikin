@@ -88,20 +88,25 @@ class FaikinAdapter extends utils.Adapter {
         this.deviceRoots.set(hostname, deviceId);
         this.rootHosts.set(deviceId, hostname);
         await this.setObjectNotExistsAsync(deviceId, {
-            type: 'device', common: { name: hostname }, native: {}
+            type: 'device', common: { name: hostname, statusStates: { onlineId: 'Status.Online' } }, native: {}
         });
+        await this.extendObjectAsync(deviceId, { common: { statusStates: { onlineId: 'Status.Online' } } });
         await this.setObjectNotExistsAsync(`${deviceId}.Status`, {
             type: 'channel', common: { name: 'Status' }, native: {}
         });
-        await this.setObjectNotExistsAsync(`${deviceId}.Steuerung`, {
-            type: 'channel', common: { name: 'Steuerung' }, native: {}
+        await this.setObjectNotExistsAsync(`${deviceId}.Control`, {
+            type: 'channel', common: { name: 'Control' }, native: {}
+        });
+        await this.setObjectNotExistsAsync(`${deviceId}.Commands`, {
+            type: 'channel', common: { name: 'Commands' }, native: {}
         });
         await this.setObjectNotExistsAsync(`${deviceId}.MQTT`, {
             type: 'channel', common: { name: 'MQTT-Nachrichten' }, native: {}
         });
-        await this.setObjectNotExistsAsync(`${deviceId}.Status.Online`, { type: 'state', common: { name: 'Online-Status Klimaanlage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} });
+        await this.setObjectNotExistsAsync(`${deviceId}.Status.Online`, { type: 'state', common: { name: 'Online-Status Klimaanlage', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
+        await this.extendObjectAsync(`${deviceId}.Status.Online`, { common: { role: 'indicator.reachable' } });
 
-        const states = [
+        const controls = [
             ['SetPower', 'Klimaanlage Ein/Aus', 'boolean', 'switch', false],
             ['SetTemperature', 'Solltemperatur setzen', 'number', 'level.temperature', 22, '°C', 18, 30],
             ['SetMode', 'Betriebsmodus setzen', 'string', 'text', 'C'],
@@ -118,21 +123,27 @@ class FaikinAdapter extends utils.Adapter {
             ['SetAutoEnabled', 'Faikin-Zeitautomatik aktivieren', 'boolean', 'switch', false],
             ['SetAutoPower', 'Temperaturabhängiges Ein/Aus', 'boolean', 'switch', false],
             ['SetAutoTarget', 'Auto-Zieltemperatur', 'number', 'level.temperature', 22, '°C'],
-            ['SetAutoMargin', 'Auto-Toleranz', 'number', 'level', 0.5, '°C'],
-            ['PowerOn', 'Einschalten (Taster)', 'boolean', 'button', false],
-            ['PowerOff', 'Ausschalten (Taster)', 'boolean', 'button', false],
-            ['RequestStatus', 'Status anfordern (Taster)', 'boolean', 'button', false],
-            ['Restart', 'Faikin-Modul neu starten (Taster)', 'boolean', 'button', false],
-            ['SettingsRequest', 'Faikin-Einstellungen abrufen (Taster)', 'boolean', 'button', false]
+            ['SetAutoMargin', 'Auto-Toleranz', 'number', 'level', 0.5, '°C']
         ];
-        for (const [id, name, type, role, def, unit, min, max] of states) {
+        for (const [id, name, type, role, def, unit, min, max] of controls) {
             const common = { name, type, role, read: true, write: true, def };
             if (unit) common.unit = unit;
             if (min !== undefined) common.min = min;
             if (max !== undefined) common.max = max;
             if (id === 'SetMode') common.states = MODES;
             if (id === 'SetFan') common.states = FANS;
-            await this.setObjectNotExistsAsync(`${deviceId}.Steuerung.${id}`, { type: 'state', common, native: {} });
+            await this.setObjectNotExistsAsync(`${deviceId}.Control.${id}`, { type: 'state', common, native: {} });
+        }
+        const commands = [
+            ['PowerOn', 'Einschalten (Taster)', 'boolean', 'button', false],
+            ['PowerOff', 'Ausschalten (Taster)', 'boolean', 'button', false],
+            ['RequestStatus', 'Status anfordern (Taster)', 'boolean', 'button', false],
+            ['Restart', 'Faikin-Modul neu starten (Taster)', 'boolean', 'button', false],
+            ['SettingsRequest', 'Faikin-Einstellungen abrufen (Taster)', 'boolean', 'button', false]
+        ];
+        for (const [id, name, type, role, def] of commands) {
+            const common = { name, type, role, read: true, write: true, def };
+            await this.setObjectNotExistsAsync(`${deviceId}.Commands.${id}`, { type: 'state', common, native: {} });
         }
         const generic = [
             ['ControlJSON', 'Zusätzlicher JSON-Steuerbefehl', 'string', 'text'],
@@ -143,8 +154,9 @@ class FaikinAdapter extends utils.Adapter {
             ['SettingValue', 'Wert der einzelnen Einstellung', 'string', 'text']
         ];
         for (const [id, name, type, role] of generic) {
-            await this.setObjectNotExistsAsync(`${deviceId}.Steuerung.${id}`, { type: 'state', common: { name, type, role, read: true, write: true }, native: {} });
+            await this.setObjectNotExistsAsync(`${deviceId}.Commands.${id}`, { type: 'state', common: { name, type, role, read: true, write: true }, native: {} });
         }
+        await this.delObjectAsync(`${deviceId}.Steuerung`, { recursive: true });
     }
 
     async startBroker() {
@@ -274,7 +286,7 @@ class FaikinAdapter extends utils.Adapter {
                 const pending = this.pending.get(pendingKey);
                 if (pending && Date.now() < pending.expires && pending.value !== value) return;
                 if (pending && pending.value === value) this.pending.delete(pendingKey);
-                await this.setStateAsync(`${root}.Steuerung.${controlId}`, value, true);
+                await this.setStateAsync(`${root}.Control.${controlId}`, value, true);
             }
         }
     }
@@ -291,9 +303,11 @@ class FaikinAdapter extends utils.Adapter {
     onStateChange(id, state) {
         if (!state || state.ack || !id.startsWith(`${this.namespace}.`)) return;
         const relative = id.slice(`${this.namespace}.`.length);
-        const marker = '.Steuerung.';
+        const controlMarker = '.Control.';
+        const commandMarker = '.Commands.';
+        const marker = relative.includes(controlMarker) ? controlMarker : relative.includes(commandMarker) ? commandMarker : null;
+        if (!marker) return;
         const markerIndex = relative.indexOf(marker);
-        if (markerIndex < 0) return;
         const root = relative.slice(0, markerIndex);
         const hostname = this.rootHosts.get(root);
         if (!hostname) return;
@@ -331,16 +345,16 @@ class FaikinAdapter extends utils.Adapter {
         } else if (key === 'CommandTopic') {
             if (value) this.log.debug(`Befehlsthema ${value} gespeichert; Nutzlast über CommandPayload senden.`);
         } else if (key === 'CommandPayload') {
-            const command = await this.getStateAsync(`${this.rootFor(hostname)}.Steuerung.CommandTopic`);
+            const command = await this.getStateAsync(`${this.rootFor(hostname)}.Commands.CommandTopic`);
             if (command && command.val) await this.publish(`command/${hostname}/${String(command.val).replace(/^command\//, '').replace(`${hostname}/`, '')}`, String(value ?? ''));
         } else if (key === 'SettingName') {
             this.log.debug('Einstellungsname bereit; nachfolgende Änderung an SettingValue sendet den Wert.');
         } else if (key === 'SettingValue') {
-            const setting = await this.getStateAsync(`${this.rootFor(hostname)}.Steuerung.SettingName`);
+            const setting = await this.getStateAsync(`${this.rootFor(hostname)}.Commands.SettingName`);
             if (setting && setting.val) await this.publish(`setting/${hostname}/${setting.val}`, String(value ?? ''));
         }
         if (['PowerOn', 'PowerOff', 'RequestStatus', 'Restart', 'SettingsRequest'].includes(key) && value) {
-            await this.setStateAsync(`${this.rootFor(hostname)}.Steuerung.${key}`, false, true);
+            await this.setStateAsync(`${this.rootFor(hostname)}.Commands.${key}`, false, true);
         }
     }
 

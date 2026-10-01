@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.3 (2026-10-01)
+
+- Show device reachability in the object tree using the built-in status indicator.
+- Separate writable controls and one-time commands into `Control` and `Commands` object folders.
+
 ## 0.1.2 (2026-10-01)
 
 - Subscribe to writable control states so commands are processed.

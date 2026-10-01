@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "faikin",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "news": {
+      "0.1.3": {
+        "en": "Separate writable controls and one-time commands into clear object folders, and show device reachability in the object tree.",
+        "de": "Bedienbare Steuerungen und einmalige Befehle in eindeutige Objektordner trennen und die Geräte-Erreichbarkeit im Objektbaum anzeigen."
+      },
       "0.1.2": {
         "en": "Subscribe to control states and map incoming online status to the dedicated device state.",
         "de": "Steuerungszustände abonnieren und den empfangenen Online-Status dem Geräte-Statuspunkt zuordnen."
