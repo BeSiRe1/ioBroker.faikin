@@ -2,7 +2,7 @@
 
 An ioBroker adapter for Daikin air conditioners using Faikin/Faikout firmware. It contains its own MQTT broker, so Faikin modules can connect directly to this adapter. One adapter instance can accept several modules; each module needs a unique MQTT hostname.
 
-> **Development status:** 0.1.1 is an initial development version. It needs installation and real-device testing before it should be used on a production ioBroker system.
+> **Development status:** 0.1.2 is an initial development version. It needs installation and real-device testing before it should be used on a production ioBroker system.
 
 ## Features
 
@@ -53,7 +53,7 @@ MIT. See [LICENSE](LICENSE).
 
 Ein ioBroker-Adapter für Daikin-Klimaanlagen mit Faikin-/Faikout-Firmware. Der Adapter enthält einen eigenen MQTT-Broker, mit dem sich die Module direkt verbinden. Eine Adapterinstanz kann mehrere Module aufnehmen; jedes benötigt einen eigenen MQTT-Hostnamen.
 
-> **Entwicklungsstand:** Version 0.1.1 ist eine erste Entwicklungsversion. Vor dem produktiven Einsatz muss sie installiert und mit echten Geräten geprüft werden.
+> **Entwicklungsstand:** Version 0.1.2 ist eine erste Entwicklungsversion. Vor dem produktiven Einsatz muss sie installiert und mit echten Geräten geprüft werden.
 
 ## Funktionen
 

@@ -18,7 +18,7 @@ const STATUS_LABELS = {
     protocol: 'Protokoll'
 };
 const ID_MAP = {
-    home: 'Raumtemperatur', outside: 'Aussentemperatur', liquid: 'Kuehlmittelvorlauf', comp: 'Kompressorleistung',
+    online: 'Online', home: 'Raumtemperatur', outside: 'Aussentemperatur', liquid: 'Kuehlmittelvorlauf', comp: 'Kompressorleistung',
     fanrpm: 'Luefterdrehzahl', mode: 'Betriebsmodus', temp: 'Solltemperatur', fan: 'Luefterstufe',
     anglev: 'Lamellenwinkel_vertikal', Whoutside: 'Energieverbrauch_Gesamt', Whheating: 'Energieverbrauch_Heizen',
     Whcooling: 'Energieverbrauch_Kuehlen', consumption: 'Leistungsaufnahme', demand: 'Leistungsanforderung',
@@ -69,6 +69,7 @@ class FaikinAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync('info.connection', { type: 'state', common: { name: 'MQTT-Client verbunden', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
         await this.setStateAsync('info.connection', false, true);
         await this.createObjects();
+        this.subscribeStates('*');
         await this.startBroker();
         this.log.info(`Faikin-MQTT-Broker lauscht auf ${this.config.bind}:${this.config.port}; automatische Geräteerkennung aktiv.`);
     }
@@ -198,6 +199,7 @@ class FaikinAdapter extends utils.Adapter {
                 return;
             }
             if (payload === this.lastStatusPayload.get(hostname)) return;
+            await this.setStateAsync(`${root}.Status.Online`, true, true);
             let data;
             try { data = JSON.parse(payload); } catch { data = payload; }
             if (data && typeof data === 'object' && !Array.isArray(data)) {
@@ -212,6 +214,11 @@ class FaikinAdapter extends utils.Adapter {
         }
         if (topic.startsWith(`${devicePrefix}/`)) {
             const key = topic.slice(devicePrefix.length + 1).replaceAll('/', '.');
+            await this.setStateAsync(`${root}.Status.Online`, true, true);
+            if (key === 'online') {
+                await this.setStateAsync(`${root}.Status.Online`, this.parseValue(payload) === true, true);
+                return;
+            }
             await this.writeValue(`${root}.Status.${key}`, this.parseValue(payload), STATUS_LABELS[key] || key);
             return;
         }
