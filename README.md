@@ -35,6 +35,10 @@ This direct GitHub installation is for testing. Inclusion in the official ioBrok
 
 The broker uses unencrypted MQTT and should only be reachable on a trusted local network. Do not forward its port from the internet. The fields each air conditioner reports depend on its model and firmware; newly received fields and topics are added automatically.
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for the version history.
+
 ## Development
 
 Requirements: Node.js 22.19 or newer.
@@ -84,6 +88,10 @@ Die direkte GitHub-Installation dient zunächst zum Testen. Eine Aufnahme in die
 4. Weise jedem Modul in der Faikin-Oberfläche unter **WiFi settings** einen eindeutigen Hostnamen zu. Der Adapter erkennt jedes Modul anhand dieses MQTT-Hostnamens und legt dafür getrennte Objekte unter `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands` und `<hostname>.MQTT` an. Allgemeine MQTT-Themen ohne Geräte-Hostname erscheinen unter `General.MQTT`.
 
 Der Broker verwendet unverschlüsseltes MQTT und sollte nur im vertrauenswürdigen lokalen Netzwerk erreichbar sein. Den Port nicht aus dem Internet freigeben. Welche Werte das jeweilige Klimagerät meldet, hängt von Modell und Firmware ab; neu empfangene Felder und Themen werden automatisch ergänzt.
+
+## Versionsverlauf
+
+Der Versionsverlauf steht in der [CHANGELOG.md](CHANGELOG.md).
 
 ## Lizenz
 
