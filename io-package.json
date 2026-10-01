@@ -1,15 +1,11 @@
 {
   "common": {
     "name": "faikin",
-    "version": "0.1.3",
+    "version": "0.1.1",
     "news": {
-      "0.1.3": {
-        "en": "Group Faikin, Wi-Fi, and undocumented raw values in Info, separate module reachability from air-conditioner response, and keep energy counters and heating activity in Status.",
-        "de": "Faikin-, WLAN- und nicht dokumentierte Rohwerte direkt in Info sammeln, Modul-Erreichbarkeit und Antwort der Klimaanlage trennen sowie Energieverbrauch und Heizstatus in Status belassen."
-      },
-      "0.1.2": {
-        "en": "Subscribe to control states and map incoming online status to the dedicated device state.",
-        "de": "Steuerungszustände abonnieren und den empfangenen Online-Status dem Geräte-Statuspunkt zuordnen."
+      "0.1.1": {
+        "en": "Configure the embedded MQTT broker, discover multiple modules, and separate module reachability from air-conditioner reachability.",
+        "de": "Den integrierten MQTT-Broker konfigurieren, mehrere Module erkennen und Modul-Erreichbarkeit von der Erreichbarkeit der Klimaanlage unterscheiden."
       },
       "0.1.0": {
         "en": "Initial adapter implementation with an embedded MQTT broker, Faikin status objects, controls and generic MQTT access.",
