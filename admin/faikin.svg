@@ -1,7 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Faikin Klimasteuerung">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Faikin">
   <rect width="128" height="128" rx="24" fill="#f2f8fa"/>
-  <path d="M39 38a10 10 0 0 1 10-10h28a10 10 0 0 1 10 10v52a10 10 0 0 1-10 10H49a10 10 0 0 1-10-10V38Z" fill="#fff" stroke="#263238" stroke-width="6"/>
-  <path d="M48 55c6 0 8-7 14-7s8 7 14 7M48 67c6 0 8-7 14-7s8 7 14 7M48 79c6 0 8-7 14-7s8 7 14 7" fill="none" stroke="#13a6a6" stroke-linecap="round" stroke-width="5"/>
-  <circle cx="76" cy="88" r="3.5" fill="#263238"/>
-  <path d="M91 22a17 17 0 0 1 14 14M94 31a8 8 0 0 1 6 6" fill="none" stroke="#13a6a6" stroke-linecap="round" stroke-width="5"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 36a10 10 0 0 1 10-10h39a10 10 0 0 1 10 10v48a10 10 0 0 1-10 10H40a10 10 0 0 1-10-10V36Z" stroke="#263238" stroke-width="6"/>
+    <path d="M39 49c7 0 8-8 15-8s8 8 15 8M39 61c7 0 8-8 15-8s8 8 15 8M39 73c7 0 8-8 15-8s8 8 15 8" stroke="#13a6a6" stroke-width="5"/>
+    <path d="M84 18a22 22 0 0 1 18 18M87 29a11 11 0 0 1 9 9" stroke="#13a6a6" stroke-width="5"/>
+  </g>
+  <circle cx="74" cy="81" r="3" fill="#263238"/>
+  <text x="64" y="116" fill="#263238" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="1.2" text-anchor="middle">FAIKIN</text>
 </svg>
