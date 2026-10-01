@@ -2,6 +2,8 @@
 
 An ioBroker adapter for Daikin air conditioners using Faikin/Faikout firmware. It contains its own MQTT broker, so Faikin modules can connect directly to this adapter. One adapter instance can accept several modules. Each Faikin module needs a unique hostname, set under **WiFi settings** in the Faikin interface. Faikin uses this hostname for both DHCP and MQTT.
 
+For device setup and firmware documentation, see the [official Faikin documentation](https://www.faikin.au/pages/instructions).
+
 > **Development status:** Version 0.1.1 is an early development release. It needs installation and real-device testing before it should be used on a production ioBroker system.
 
 ## Features
@@ -59,6 +61,8 @@ MIT. See [LICENSE](LICENSE).
 # Faikin (Deutsch)
 
 Ein ioBroker-Adapter für Daikin-Klimaanlagen mit Faikin-/Faikout-Firmware. Der Adapter enthält einen eigenen MQTT-Broker, mit dem sich die Module direkt verbinden. Eine Adapterinstanz kann mehrere Module aufnehmen. Jedes Faikin-Modul benötigt einen eigenen Hostnamen. Dieser wird in der Faikin-Oberfläche unter **WiFi settings** festgelegt und von Faikin sowohl für DHCP als auch für MQTT verwendet.
+
+Informationen zur Einrichtung und Firmware stehen in der [offiziellen Faikin-Dokumentation](https://www.faikin.au/pages/instructions).
 
 > **Entwicklungsstand:** Version 0.1.1 ist eine frühe Entwicklungsversion. Vor dem produktiven Einsatz muss sie installiert und mit echten Geräten geprüft werden.
 
