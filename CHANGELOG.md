@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.2 (2026-10-02)
+
+- Create writable controls only when a Faikin module reports the corresponding capability.
+- Read target temperature limits and step size from Faikin Home Assistant MQTT discovery when available.
+- Add the additional reported controls for presets, demand, sensor, display LED, and humidification.
+- Derive module reachability from `up`, air-conditioner reachability from `online`, and clear both when the module disconnects.
+- Give the known information fields (`flash`, `id`, `mem`, `mqtt-up`, `rst`, and `spi`) descriptive names; set memory-size units to bytes and MQTT runtime to seconds.
+- Place received values under `Status` or `Info` according to their original Faikin MQTT topic family; keep raw `up` and `online` values under `Info` while updating separate reachability indicators under `Status`.
+
 ## 0.1.1 (2026-10-01)
 
 - List connected Faikin hostnames in the adapter-level connection state.

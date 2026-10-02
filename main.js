@@ -13,7 +13,8 @@ const STATUS_LABELS = {
     Whcooling: 'Energieverbrauch Kühlen', consumption: 'Leistungsaufnahme', demand: 'Leistungsanforderung',
     swingh: 'Horizontales Schwingen', swingv: 'Vertikales Schwingen', econo: 'Energiesparmodus',
     powerful: 'Powerful-Modus', comfort: 'Comfort-Modus', streamer: 'Streamer-/Luftreinigungsfunktion',
-    sensor: 'Sensorfunktion', quiet: 'Quiet-/Leise-Modus', autor: 'Auto-Toleranz', autot: 'Auto-Zieltemperatur',
+    sensor: 'Sensorfunktion', led: 'Anzeige-LED', humidify: 'Befeuchtungsmodus', preset: 'Voreinstellung',
+    quiet: 'Quiet-/Leise-Modus', autor: 'Auto-Toleranz', autot: 'Auto-Zieltemperatur',
     auto0: 'Auto-Ausschaltzeit', auto1: 'Auto-Einschaltzeit', autop: 'Automatisches Ein/Aus',
     autoe: 'Automatik aktiviert', env: 'Referenztemperatur', slave: 'Heiz-/Kühlmodus nicht führend',
     antifreeze: 'Frostschutzbetrieb aktiv', model: 'Klimaanlagenmodell'
@@ -21,24 +22,19 @@ const STATUS_LABELS = {
 const INFO_LABELS = {
     app: 'Anwendungsname', bssid: 'WLAN-BSSID', build: 'Firmware-Buildzeit', 'build-suffix': 'Firmware-Buildvariante',
     chan: 'WLAN-Kanal', control: 'Externe/automatische Steuerung aktiv',
-    ipv4: 'IPv4-Adresse', ipv6: 'IPv6-Adresse', protocol: 'Kommunikationsprotokoll',
-    ts: 'Zeitstempel (Faikin)', rssi: 'WLAN-Signalstärke', ssid: 'WLAN-Name (SSID)',
-    uptime: 'Betriebszeit', version: 'Firmware-Version'
+    flash: 'Flash-Größe', id: 'Geräte-ID', ipv4: 'IPv4-Adresse', ipv6: 'IPv6-Adresse',
+    mem: 'Freier Speicher', 'mqtt-up': 'MQTT-Laufzeit', protocol: 'Kommunikationsprotokoll',
+    rst: 'Neustartcode', rssi: 'WLAN-Signalstärke', spi: 'Freier SPI-Speicher', ssid: 'WLAN-Name (SSID)',
+    ts: 'Zeitstempel (Faikin)', uptime: 'Betriebszeit', version: 'Firmware-Version',
+    up: 'Faikin-Modul online', online: 'Klimaanlage erreichbar'
 };
-const INFO_FIELDS = new Set([
-    'app', 'bssid', 'build', 'build-suffix', 'chan', 'control', 'ipv4', 'ipv6', 'rssi', 'ssid', 'uptime', 'version'
-]);
-const INFO_RAW_LABELS = {
-    up: 'Up-Wert (Rohwert)', 'mqtt-up': 'MQTT-Verbindungswert (Rohwert)', flash: 'Flash-Wert (Rohwert)',
-    id: 'Modulkennung (Rohwert)', mem: 'Speicherwert (Rohwert)', rst: 'Neustartcode (Rohwert)', spi: 'SPI-Wert (Rohwert)'
-};
-const INFO_RAW_FIELDS = new Set(Object.keys(INFO_RAW_LABELS));
 const INFO_ID_MAP = {
     app: 'application_name', bssid: 'wifi_bssid', build: 'firmware_build_time', 'build-suffix': 'firmware_build_variant',
     chan: 'wifi_channel', control: 'external_control_active', ipv4: 'ipv4_address', ipv6: 'ipv6_address',
     protocol: 'communication_protocol', ts: 'timestamp', rssi: 'wifi_signal_strength', ssid: 'wifi_ssid',
-    uptime: 'uptime_seconds', version: 'firmware_version', up: 'up_value', 'mqtt-up': 'mqtt_up_value',
-    flash: 'flash_value', id: 'module_id', mem: 'memory_value', rst: 'restart_code', spi: 'spi_value'
+    uptime: 'uptime_seconds', version: 'firmware_version', 'mqtt-up': 'mqtt_uptime_seconds',
+    flash: 'flash_size', id: 'device_id', mem: 'free_memory', rst: 'restart_code', spi: 'free_spi_memory',
+    up: 'module_online', online: 'air_conditioner_reachable'
 };
 const ID_MAP = {
     online: 'air_conditioner_reachable', power: 'power', heat: 'heating_active', home: 'room_temperature',
@@ -49,15 +45,16 @@ const ID_MAP = {
     Whheating: 'energy_consumption_heating', Whcooling: 'energy_consumption_cooling',
     consumption: 'power_consumption', demand: 'power_demand', swingh: 'horizontal_swing',
     swingv: 'vertical_swing', econo: 'economy_mode', powerful: 'powerful_mode', comfort: 'comfort_mode',
-    streamer: 'streamer', sensor: 'sensor_function', quiet: 'quiet_mode', autor: 'auto_tolerance',
+    streamer: 'streamer', sensor: 'sensor_function', led: 'display_led', humidify: 'humidification_mode',
+    preset: 'preset', quiet: 'quiet_mode', autor: 'auto_tolerance',
     autot: 'auto_target_temperature', auto0: 'auto_off_time', auto1: 'auto_on_time',
     autop: 'automatic_power', autoe: 'automation_enabled', env: 'reference_temperature',
     slave: 'slave', antifreeze: 'antifreeze_mode', model: 'air_conditioner_model', ts: 'timestamp', protocol: 'protocol'
 };
 const UNITS = {
     home: '°C', outside: '°C', liquid: '°C', inlet: '°C', temp: '°C', autot: '°C', autor: '°C', env: '°C',
-    comp: 'Hz', hum: '%', demand: '%', rssi: 'dBm', uptime: 's', fanrpm: 'U/min', anglev: '°',
-    Whoutside: 'Wh', Whheating: 'Wh', Whcooling: 'Wh', consumption: 'W'
+    comp: 'Hz', hum: '%', demand: '%', rssi: 'dBm', uptime: 's', 'mqtt-up': 's', fanrpm: 'U/min', anglev: '°',
+    flash: 'B', mem: 'B', spi: 'B', Whoutside: 'Wh', Whheating: 'Wh', Whcooling: 'Wh', consumption: 'W'
 };
 const MODES = { H: 'Heizen', C: 'Kühlen', A: 'Auto', D: 'Trocknen', F: 'Nur Lüfter' };
 const FANS = { A: 'Auto', Q: 'Nacht/Leise', '1': 'Stufe 1', '2': 'Stufe 2', '3': 'Stufe 3', '4': 'Stufe 4', '5': 'Stufe 5' };
@@ -67,9 +64,34 @@ const CONTROL_TO_FIELD = {
     horizontal_swing: 'swingh', vertical_swing: 'swingv', powerful_mode: 'powerful', economy_mode: 'econo',
     comfort_mode: 'comfort', streamer: 'streamer', quiet_mode: 'quiet', auto_off_time: 'auto0', auto_on_time: 'auto1',
     auto_schedule_enabled: 'autoe', temperature_dependent_power: 'autop', auto_target_temperature: 'autot',
-    auto_tolerance: 'autor'
+    auto_tolerance: 'autor', preset: 'preset', demand_control: 'demand', sensor_function: 'sensor',
+    display_led: 'led', humidification_mode: 'humidify'
 };
 const FIELD_TO_CONTROL = Object.fromEntries(Object.entries(CONTROL_TO_FIELD).map(([control, field]) => [field, control]));
+const CONTROL_DEFINITIONS = {
+    power: ['Klimaanlage Ein/Aus', 'boolean', 'switch', false],
+    target_temperature: ['Solltemperatur setzen', 'number', 'level.temperature', 22, '°C'],
+    operating_mode: ['Betriebsmodus setzen', 'string', 'text', 'C'],
+    fan_speed: ['Lüfterstufe setzen', 'string', 'text', 'A'],
+    horizontal_swing: ['Swing horizontal setzen', 'boolean', 'switch', false],
+    vertical_swing: ['Swing vertikal setzen', 'boolean', 'switch', false],
+    powerful_mode: ['Powerful-Modus setzen', 'boolean', 'switch', false],
+    economy_mode: ['Economy-Modus setzen', 'boolean', 'switch', false],
+    comfort_mode: ['Comfort-Modus setzen', 'boolean', 'switch', false],
+    streamer: ['Streamer-/Luftreinigungsfunktion setzen', 'boolean', 'switch', false],
+    quiet_mode: ['Quiet-/Leise-Modus setzen', 'boolean', 'switch', false],
+    auto_off_time: ['Automatisches Ausschalten (HH:MM)', 'string', 'text', '00:00'],
+    auto_on_time: ['Automatisches Einschalten (HH:MM)', 'string', 'text', '00:00'],
+    auto_schedule_enabled: ['Faikin-Zeitautomatik aktivieren', 'boolean', 'switch', false],
+    temperature_dependent_power: ['Temperaturabhängiges Ein/Aus', 'boolean', 'switch', false],
+    auto_target_temperature: ['Auto-Zieltemperatur', 'number', 'level.temperature', 22, '°C'],
+    auto_tolerance: ['Auto-Toleranz', 'number', 'level', 0.5, '°C'],
+    preset: ['Voreinstellung', 'string', 'state', 'home'],
+    demand_control: ['Leistungsbegrenzung', 'number', 'level', 100, '%', 30, 100, 5],
+    sensor_function: ['Anwesenheitssensor', 'boolean', 'switch', false],
+    display_led: ['Anzeige-LED', 'boolean', 'switch', false],
+    humidification_mode: ['Befeuchtung', 'string', 'text', 'off']
+};
 const DEFAULTS = {
     port: 1884, bind: '0.0.0.0', username: '', password: ''
 };
@@ -85,6 +107,8 @@ class FaikinAdapter extends utils.Adapter {
         this.deviceRoots = new Map();
         this.deviceSetups = new Map();
         this.rootHosts = new Map();
+        this.controlObjects = new Set();
+        this.temperatureRanges = new Map();
         this.on('ready', () => this.onReady());
         this.on('stateChange', (id, state) => this.onStateChange(id, state));
         this.on('unload', callback => this.onUnload(callback));
@@ -149,34 +173,6 @@ class FaikinAdapter extends utils.Adapter {
         await this.extendObjectAsync(`${deviceId}.Status.module_online`, { common: { name: 'Faikin-Modul online', role: 'indicator.reachable' } });
         await this.setObjectNotExistsAsync(`${deviceId}.Status.air_conditioner_reachable`, { type: 'state', common: { name: STATUS_LABELS.online, type: 'boolean', role: 'indicator', read: true, write: false }, native: {} });
         await this.extendObjectAsync(`${deviceId}.Status.air_conditioner_reachable`, { common: { name: STATUS_LABELS.online } });
-        const controls = [
-            ['power', 'Klimaanlage Ein/Aus', 'boolean', 'switch', false],
-            ['target_temperature', 'Solltemperatur setzen', 'number', 'level.temperature', 22, '°C', 18, 30],
-            ['operating_mode', 'Betriebsmodus setzen', 'string', 'text', 'C'],
-            ['fan_speed', 'Lüfterstufe setzen', 'string', 'text', 'A'],
-            ['horizontal_swing', 'Swing horizontal setzen', 'boolean', 'switch', false],
-            ['vertical_swing', 'Swing vertikal setzen', 'boolean', 'switch', false],
-            ['powerful_mode', 'Powerful-Modus setzen', 'boolean', 'switch', false],
-            ['economy_mode', 'Economy-Modus setzen', 'boolean', 'switch', false],
-            ['comfort_mode', 'Comfort-Modus setzen', 'boolean', 'switch', false],
-            ['streamer', 'Streamer-/Luftreinigungsfunktion setzen', 'boolean', 'switch', false],
-            ['quiet_mode', 'Quiet-/Leise-Modus setzen', 'boolean', 'switch', false],
-            ['auto_off_time', 'Automatisches Ausschalten (HH:MM)', 'string', 'text', '00:00'],
-            ['auto_on_time', 'Automatisches Einschalten (HH:MM)', 'string', 'text', '00:00'],
-            ['auto_schedule_enabled', 'Faikin-Zeitautomatik aktivieren', 'boolean', 'switch', false],
-            ['temperature_dependent_power', 'Temperaturabhängiges Ein/Aus', 'boolean', 'switch', false],
-            ['auto_target_temperature', 'Auto-Zieltemperatur', 'number', 'level.temperature', 22, '°C'],
-            ['auto_tolerance', 'Auto-Toleranz', 'number', 'level', 0.5, '°C']
-        ];
-        for (const [id, name, type, role, def, unit, min, max] of controls) {
-            const common = { name, type, role, read: true, write: true, def };
-            if (unit) common.unit = unit;
-            if (min !== undefined) common.min = min;
-            if (max !== undefined) common.max = max;
-            if (id === 'operating_mode') common.states = MODES;
-            if (id === 'fan_speed') common.states = FANS;
-            await this.setObjectNotExistsAsync(`${deviceId}.Control.${id}`, { type: 'state', common, native: {} });
-        }
         const commands = [
             ['power_on', 'Einschalten (Taster)', 'boolean', 'button', false],
             ['power_off', 'Ausschalten (Taster)', 'boolean', 'button', false],
@@ -222,9 +218,7 @@ class FaikinAdapter extends utils.Adapter {
             this.updateConnectedClientsState();
         });
         this.broker.on('clientDisconnect', client => {
-            this.clients.delete(client.id);
-            this.log.info(`MQTT-Client getrennt: ${client.id}`);
-            this.updateConnectedClientsState();
+            this.handleClientDisconnect(client).catch(error => this.log.error(`MQTT-Trennung ${client.id}: ${error.message || error}`));
         });
         this.broker.on('publish', (packet, client) => {
             if (!client || !packet.topic || packet.topic.startsWith('$SYS/')) return;
@@ -246,7 +240,25 @@ class FaikinAdapter extends utils.Adapter {
         this.setState('info.connection', hostnames.join(', '), true);
     }
 
+    async handleClientDisconnect(client) {
+        const hostname = this.clients?.get(client.id);
+        this.clients?.delete(client.id);
+        this.log.info(`MQTT-Client getrennt: ${client.id}`);
+        this.updateConnectedClientsState();
+        if (hostname && ![...this.clients.values()].includes(hostname)) await this.setModuleOnline(hostname, false);
+    }
+
+    async setModuleOnline(hostname, online) {
+        await this.createObjects(hostname);
+        const root = this.rootFor(hostname);
+        await this.setStateAsync(`${root}.Status.module_online`, online, true);
+        if (!online) await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, false, true);
+    }
+
     async handleIncoming(topic, payload, clientId) {
+        if (topic.endsWith('/config')) {
+            await this.handleClimateDiscovery(payload);
+        }
         const parts = topic.split('/');
         const topicFamilies = ['state', 'setting', 'command', 'info', 'event', 'error', 'Faikout'];
         const hostname = topicFamilies.includes(parts[0]) && parts.length > 1 ? parts[1] : null;
@@ -255,19 +267,20 @@ class FaikinAdapter extends utils.Adapter {
             this.updateConnectedClientsState();
         }
         if (hostname) await this.createObjects(hostname);
+        if (clientId && this.clients && !this.clients.has(clientId)) return;
         const root = hostname ? this.rootFor(hostname) : GENERAL_FOLDER;
         const devicePrefix = hostname ? `state/${hostname}` : null;
         if (devicePrefix && (topic === devicePrefix || topic === `${devicePrefix}/status`)) {
             if (payload === 'true' || payload === 'false') {
-                await this.setStateAsync(`${root}.Status.module_online`, payload === 'true', true);
+                if (payload === 'false') await this.setModuleOnline(hostname, false);
                 return;
             }
             if (payload === this.lastStatusPayload.get(hostname)) return;
-            await this.setStateAsync(`${root}.Status.module_online`, true, true);
             let data;
             try { data = JSON.parse(payload); } catch { data = payload; }
             if (data && typeof data === 'object' && !Array.isArray(data)) {
-                for (const [key, value] of Object.entries(data)) {
+                const entries = Object.entries(data).sort(([a], [b]) => a === 'up' ? -1 : b === 'up' ? 1 : 0);
+                for (const [key, value] of entries) {
                     await this.writeStatusValue(hostname, key, value);
                 }
                 this.lastStatusPayload.set(hostname, payload);
@@ -278,16 +291,7 @@ class FaikinAdapter extends utils.Adapter {
         }
         if (devicePrefix && topic.startsWith(`${devicePrefix}/`)) {
             const key = topic.slice(devicePrefix.length + 1).replaceAll('/', '.');
-            await this.setStateAsync(`${root}.Status.module_online`, true, true);
-            if (key === 'online') {
-                await this.writeStatusValue(hostname, key, this.parseValue(payload));
-                return;
-            }
-            if (['hum', 'power', 'heat', 'up', 'mqtt-up', 'protocol', 'ts'].includes(key) || INFO_FIELDS.has(key)) {
-                await this.writeStatusValue(hostname, key, this.parseValue(payload));
-                return;
-            }
-            await this.writeValue(`${root}.Status.${key}`, this.parseValue(payload), STATUS_LABELS[key] || key);
+            await this.writeStatusValue(hostname, key, this.parseValue(payload));
             return;
         }
         const families = ['info', 'event', 'error', 'Faikout'];
@@ -297,8 +301,21 @@ class FaikinAdapter extends utils.Adapter {
                 const suffix = topic.slice(prefix.length).replace(/^\//, '').replaceAll('/', '.') || 'message';
                 if (family === 'info') {
                     const statusKey = suffix.split('.').pop();
-                    if (['hum', 'power', 'heat', 'up', 'mqtt-up'].includes(statusKey)) {
-                        await this.writeStatusValue(hostname, statusKey, this.parseValue(payload));
+                    if (statusKey === 'up' || statusKey === 'online') {
+                        const value = this.parseValue(payload);
+                        await this.writeInfoValue(hostname, suffix, value, topic);
+                        if (statusKey === 'up') {
+                            if (typeof value === 'boolean') await this.setModuleOnline(hostname, value);
+                            else if (value === 0 || value === 1) await this.setModuleOnline(hostname, value === 1);
+                        } else if (typeof value === 'boolean') {
+                            const root = this.rootFor(hostname);
+                            if (!value) {
+                                await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, false, true);
+                            } else {
+                                const moduleState = await this.getStateAsync(`${root}.Status.module_online`);
+                                if (moduleState?.val === true) await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, true, true);
+                            }
+                        }
                         return;
                     }
                     await this.writeInfoValue(hostname, suffix, this.parseValue(payload), topic);
@@ -321,6 +338,51 @@ class FaikinAdapter extends utils.Adapter {
         await this.writeValue(`${root}.MQTT.Eingehend.${safeTopic}`, this.parseValue(payload), topic);
     }
 
+    async handleClimateDiscovery(payload) {
+        let discovery;
+        try { discovery = JSON.parse(payload); } catch { return; }
+        const availabilityTopic = discovery.avty_t || discovery.availability_topic;
+        const match = typeof availabilityTopic === 'string' && availabilityTopic.match(/^state\/([^/]+)(?:\/|$)/);
+        if (!match) return;
+        const min = Number(discovery.min_temp);
+        const max = Number(discovery.max_temp);
+        const step = Number(discovery.temp_step);
+        if (!Number.isFinite(min) || !Number.isFinite(max) || min >= max || !Number.isFinite(step) || step <= 0) return;
+        const hostname = match[1];
+        this.temperatureRanges.set(hostname, { min, max, step });
+        await this.createObjects(hostname);
+        await this.applyTemperatureRange(hostname);
+        this.log.info(`${hostname}: Solltemperaturbereich ${min}–${max} °C, Schrittweite ${step} °C aus MQTT-Erkennung übernommen.`);
+    }
+
+    async applyTemperatureRange(hostname) {
+        const range = this.temperatureRanges.get(hostname);
+        if (!range) return;
+        const id = `${this.rootFor(hostname)}.Control.target_temperature`;
+        const object = await this.getObjectAsync(id);
+        if (object) await this.extendObjectAsync(id, { common: range });
+    }
+
+    async ensureControlObject(hostname, controlId) {
+        const definition = CONTROL_DEFINITIONS[controlId];
+        if (!definition) return;
+        const id = `${this.rootFor(hostname)}.Control.${controlId}`;
+        if (this.controlObjects.has(id)) return;
+        const [name, type, role, def, unit, min, max, step] = definition;
+        const common = { name, type, role, read: true, write: true, def };
+        if (unit) common.unit = unit;
+        if (min !== undefined) common.min = min;
+        if (max !== undefined) common.max = max;
+        if (step !== undefined) common.step = step;
+        if (controlId === 'operating_mode') common.states = MODES;
+        if (controlId === 'fan_speed') common.states = FANS;
+        if (controlId === 'preset') common.states = { home: 'Zuhause', eco: 'Sparbetrieb', boost: 'Boost' };
+        if (controlId === 'target_temperature') Object.assign(common, this.temperatureRanges.get(hostname) || {});
+        await this.setObjectNotExistsAsync(id, { type: 'state', common, native: { field: CONTROL_TO_FIELD[controlId] } });
+        await this.extendObjectAsync(id, { common });
+        this.controlObjects.add(id);
+    }
+
     parseValue(value) {
         if (value === 'true') return true;
         if (value === 'false') return false;
@@ -332,21 +394,18 @@ class FaikinAdapter extends utils.Adapter {
     }
 
     async writeStatusValue(hostname, key, value) {
-        if (key === 'protocol' || key === 'ts') {
-            await this.writeInfoValue(hostname, key, value);
-            return;
-        }
-        if (INFO_FIELDS.has(key)) {
-            await this.writeInfoValue(hostname, key, value);
-            return;
-        }
-        if (INFO_RAW_FIELDS.has(key)) {
-            await this.writeInfoValue(hostname, key, value);
+        if (key === 'up') {
+            if (typeof value === 'boolean') await this.setModuleOnline(hostname, value);
+            else if (value === 0 || value === 1) await this.setModuleOnline(hostname, value === 1);
             return;
         }
         const root = this.rootFor(hostname);
-        const idName = ID_MAP[key] || key.replace(/[^a-zA-Z0-9_-]/g, '_');
-        const label = STATUS_LABELS[key] || key;
+        if (key === 'online' && value === true) {
+            const moduleState = await this.getStateAsync(`${root}.Status.module_online`);
+            if (!moduleState || moduleState.val !== true) return;
+        }
+        const idName = ID_MAP[key] || INFO_ID_MAP[key] || key.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const label = STATUS_LABELS[key] || INFO_LABELS[key] || key;
         const unit = UNITS[key];
         const id = `${root}.Status.${idName}`;
         if (Array.isArray(value)) {
@@ -359,6 +418,7 @@ class FaikinAdapter extends utils.Adapter {
             if (key === 'fan' && FANS[value]) await this.writeValue(`${root}.Status.fan_text`, FANS[value], 'Lüfterstufe (Klartext)');
             const controlId = FIELD_TO_CONTROL[key];
             if (controlId) {
+                await this.ensureControlObject(hostname, controlId);
                 const pendingKey = `${hostname}:${controlId}`;
                 const pending = this.pending.get(pendingKey);
                 if (pending && Date.now() < pending.expires && pending.value !== value) return;
@@ -372,9 +432,9 @@ class FaikinAdapter extends utils.Adapter {
         const root = this.rootFor(hostname);
         const parts = key.split('.');
         const finalKey = parts[parts.length - 1];
-        const mappedId = INFO_ID_MAP[key] || INFO_ID_MAP[finalKey] || parts.map(part => part.replace(/[^a-zA-Z0-9_-]/g, '_')).join('.');
+        const mappedId = INFO_ID_MAP[key] || INFO_ID_MAP[finalKey] || ID_MAP[key] || ID_MAP[finalKey] || parts.map(part => part.replace(/[^a-zA-Z0-9_-]/g, '_')).join('.');
         const id = `${root}.Info.${mappedId}`;
-        const name = INFO_RAW_LABELS[finalKey] || INFO_LABELS[key] || INFO_LABELS[finalKey] || topic || key;
+        const name = INFO_LABELS[key] || INFO_LABELS[finalKey] || STATUS_LABELS[key] || STATUS_LABELS[finalKey] || topic || key;
         await this.writeValue(id, value, name, UNITS[key] || UNITS[finalKey]);
     }
 
@@ -383,7 +443,7 @@ class FaikinAdapter extends utils.Adapter {
         let common = { name: name || id.split('.').pop(), type, role: type === 'boolean' ? 'indicator' : type === 'number' ? 'value' : 'text', read: true, write: false };
         if (unit) common.unit = unit;
         await this.setObjectNotExistsAsync(id, { type: 'state', common, native: {} });
-        await this.extendObjectAsync(id, { common: { name: common.name } });
+        await this.extendObjectAsync(id, { common: { name: common.name, ...(unit ? { unit } : {}) } });
         const current = await this.getStateAsync(id);
         if (!current || current.val !== value || current.ack !== true) await this.setStateAsync(id, value, true);
     }
@@ -474,11 +534,17 @@ class FaikinAdapter extends utils.Adapter {
     onUnload(callback) {
         for (const timer of this.commandTimers.values()) clearTimeout(timer);
         this.commandTimers.clear();
+        const connectedHostnames = this.clients ? [...new Set([...this.clients.values()].filter(Boolean))] : [];
         if (this.clients) {
             this.clients.clear();
             this.updateConnectedClientsState();
         }
-        const finish = () => {
+        const finish = async () => {
+            try {
+                await Promise.all(connectedHostnames.map(hostname => this.setModuleOnline(hostname, false)));
+            } catch (error) {
+                this.log.warn(`Erreichbarkeitsstatus beim Beenden konnte nicht zurückgesetzt werden: ${error.message || error}`);
+            }
             if (this.broker) this.broker.close(() => callback());
             else callback();
         };
