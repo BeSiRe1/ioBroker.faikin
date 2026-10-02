@@ -4,7 +4,7 @@
 
 - Group Faikin energy counters, current day/month/year consumption, and retained daily/monthly/yearly JSON histories under `Energy`; display all energy values in kWh.
 - Create writable controls only when a Faikin module reports the corresponding capability.
-- Read target temperature limits and step size from Faikin Home Assistant MQTT discovery when available.
+- Use temperature limits and step size reported by the module through MQTT discovery when available.
 - Add the additional reported controls for presets, demand, sensor, display LED, and humidification.
 - Derive module reachability from `up`, air-conditioner reachability from `online`, and clear both when the module disconnects.
 - Give the known information fields (`flash`, `id`, `mem`, `mqtt-up`, `rst`, and `spi`) descriptive names; set memory-size units to bytes and MQTT runtime to seconds.
