@@ -26,7 +26,7 @@ const INFO_LABELS = {
     mem: 'Freier Speicher', 'mqtt-up': 'MQTT-Laufzeit', protocol: 'Kommunikationsprotokoll',
     rst: 'Neustartcode', rssi: 'WLAN-Signalstärke', spi: 'Freier SPI-Speicher', ssid: 'WLAN-Name (SSID)',
     ts: 'Zeitstempel (Faikin)', uptime: 'Betriebszeit', version: 'Firmware-Version',
-    up: 'Faikin-Modul online', online: 'Klimaanlage erreichbar'
+    online: 'Klimaanlage erreichbar'
 };
 const INFO_ID_MAP = {
     app: 'application_name', bssid: 'wifi_bssid', build: 'firmware_build_time', 'build-suffix': 'firmware_build_variant',
@@ -34,7 +34,7 @@ const INFO_ID_MAP = {
     protocol: 'communication_protocol', ts: 'timestamp', rssi: 'wifi_signal_strength', ssid: 'wifi_ssid',
     uptime: 'uptime_seconds', version: 'firmware_version', 'mqtt-up': 'mqtt_uptime_seconds',
     flash: 'flash_size', id: 'device_id', mem: 'free_memory', rst: 'restart_code', spi: 'free_spi_memory',
-    up: 'module_online', online: 'air_conditioner_reachable'
+    online: 'air_conditioner_reachable'
 };
 const INFO_FIELDS = new Set([
     'app', 'bssid', 'build', 'build-suffix', 'chan', 'control', 'flash', 'id', 'ipv4', 'ipv6', 'mem',
@@ -155,9 +155,9 @@ class FaikinAdapter extends utils.Adapter {
         this.deviceRoots.set(hostname, deviceId);
         this.rootHosts.set(deviceId, hostname);
         await this.setObjectNotExistsAsync(deviceId, {
-            type: 'device', common: { name: hostname, statusStates: { onlineId: 'Status.module_online' } }, native: {}
+            type: 'device', common: { name: hostname, statusStates: { onlineId: 'Info.module_online' } }, native: {}
         });
-        await this.extendObjectAsync(deviceId, { common: { statusStates: { onlineId: 'Status.module_online' } } });
+        await this.extendObjectAsync(deviceId, { common: { statusStates: { onlineId: 'Info.module_online' } } });
         await this.setObjectNotExistsAsync(`${deviceId}.Status`, {
             type: 'channel', common: { name: 'Status' }, native: {}
         });
@@ -173,8 +173,8 @@ class FaikinAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync(`${deviceId}.MQTT`, {
             type: 'channel', common: { name: 'MQTT-Nachrichten' }, native: {}
         });
-        await this.setObjectNotExistsAsync(`${deviceId}.Status.module_online`, { type: 'state', common: { name: 'Faikin-Modul online', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
-        await this.extendObjectAsync(`${deviceId}.Status.module_online`, { common: { name: 'Faikin-Modul online', role: 'indicator.reachable' } });
+        await this.setObjectNotExistsAsync(`${deviceId}.Info.module_online`, { type: 'state', common: { name: 'Faikin-Modul online', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
+        await this.extendObjectAsync(`${deviceId}.Info.module_online`, { common: { name: 'Faikin-Modul online', role: 'indicator.reachable' } });
         await this.setObjectNotExistsAsync(`${deviceId}.Status.air_conditioner_reachable`, { type: 'state', common: { name: STATUS_LABELS.online, type: 'boolean', role: 'indicator', read: true, write: false }, native: {} });
         await this.extendObjectAsync(`${deviceId}.Status.air_conditioner_reachable`, { common: { name: STATUS_LABELS.online } });
         const commands = [
@@ -255,7 +255,7 @@ class FaikinAdapter extends utils.Adapter {
     async setModuleOnline(hostname, online) {
         await this.createObjects(hostname);
         const root = this.rootFor(hostname);
-        await this.setStateAsync(`${root}.Status.module_online`, online, true);
+        await this.setStateAsync(`${root}.Info.module_online`, online, true);
         if (!online) await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, false, true);
     }
 
@@ -307,16 +307,16 @@ class FaikinAdapter extends utils.Adapter {
                     const statusKey = suffix.split('.').pop();
                     if (statusKey === 'up' || statusKey === 'online') {
                         const value = this.parseValue(payload);
-                        await this.writeInfoValue(hostname, suffix, value, topic);
                         if (statusKey === 'up') {
                             if (typeof value === 'boolean') await this.setModuleOnline(hostname, value);
                             else if (value === 0 || value === 1) await this.setModuleOnline(hostname, value === 1);
                         } else if (typeof value === 'boolean') {
+                            await this.writeInfoValue(hostname, suffix, value, topic);
                             const root = this.rootFor(hostname);
                             if (!value) {
                                 await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, false, true);
                             } else {
-                                const moduleState = await this.getStateAsync(`${root}.Status.module_online`);
+                                const moduleState = await this.getStateAsync(`${root}.Info.module_online`);
                                 if (moduleState?.val === true) await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, true, true);
                             }
                         }
@@ -399,7 +399,6 @@ class FaikinAdapter extends utils.Adapter {
 
     async writeStatusValue(hostname, key, value) {
         if (key === 'up') {
-            await this.writeInfoValue(hostname, key, value, `state/${hostname}/${key}`);
             if (typeof value === 'boolean') await this.setModuleOnline(hostname, value);
             else if (value === 0 || value === 1) await this.setModuleOnline(hostname, value === 1);
             return;
@@ -410,7 +409,7 @@ class FaikinAdapter extends utils.Adapter {
         }
         const root = this.rootFor(hostname);
         if (key === 'online' && value === true) {
-            const moduleState = await this.getStateAsync(`${root}.Status.module_online`);
+            const moduleState = await this.getStateAsync(`${root}.Info.module_online`);
             if (!moduleState || moduleState.val !== true) return;
         }
         const idName = ID_MAP[key] || INFO_ID_MAP[key] || key.replace(/[^a-zA-Z0-9_-]/g, '_');

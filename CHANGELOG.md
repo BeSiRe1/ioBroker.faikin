@@ -7,7 +7,7 @@
 - Add the additional reported controls for presets, demand, sensor, display LED, and humidification.
 - Derive module reachability from `up`, air-conditioner reachability from `online`, and clear both when the module disconnects.
 - Give the known information fields (`flash`, `id`, `mem`, `mqtt-up`, `rst`, and `spi`) descriptive names; set memory-size units to bytes and MQTT runtime to seconds.
-- Place climate status values under `Status` and device/module information under `Info`, including known information fields delivered in a state payload; keep reachability indicators under `Status`.
+- Place climate status values under `Status` and device/module information under `Info`, including known information fields delivered in a state payload; put module reachability in `Info` and air-conditioner reachability in `Status`.
 
 ## 0.1.1 (2026-10-01)
 
