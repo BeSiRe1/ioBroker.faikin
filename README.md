@@ -1,55 +1,68 @@
-# Faikin
+# Faikin for ioBroker
 
-An ioBroker adapter for Daikin air conditioners using Faikin/Faikout firmware. It contains its own MQTT broker, so Faikin modules can connect directly to this adapter. One adapter instance can accept several modules. Each Faikin module needs a unique hostname, set under **WiFi settings** in the Faikin interface. Faikin uses this hostname for both DHCP and MQTT.
+This adapter connects Faikin/Faikout modules to ioBroker and includes its own MQTT broker. One adapter instance can manage multiple Faikin/Faikout modules. Each module needs a unique hostname configured under **WiFi settings** in the Faikin interface.
 
-For device setup and firmware documentation, see the [official Faikin documentation](https://www.faikin.au/pages/instructions).
+See the [official Faikin documentation](https://www.faikin.au/pages/instructions) for module setup and firmware information.
 
 ## Features
 
-- Embedded MQTT broker with an editable port, bind address, and optional credentials.
-- Automatic discovery of Faikin/Faikout hostnames and separate device folders.
-- General MQTT topics without a device hostname go into a fixed `General` folder, not a device with an online indicator.
-- The adapter-level `info.connection` state lists connected Faikin hostnames. Each device's module reachability and the air conditioner's response are shown separately.
-- Dynamic datapoints for every status field and MQTT topic received from a device.
-- Writable controls are created only for fields the module reports as supported, including power, target temperature, mode, fan, louvre swing, auto mode, schedules, and any reported extra functions. Target temperature limits and step size are read from Faikin's Home Assistant MQTT discovery message when available.
-- Clear object folders per device: `Status` for climate values, `Info` for module details, `Energy` for energy counters and consumption history, `Control` for writable settings, `Commands` for one-time actions, and `MQTT` for received messages.
-- Energy data is grouped under `Energy`: cumulative Faikin counters and current day/month/year consumption are shown in kWh; completed day, month, and year values are retained in three JSON history states.
-- Climate status values go under `Status`; device and module information goes under `Info`, including known information fields delivered in a state payload. IDs, names, and units remain unchanged. Memory sizes are shown in bytes. Faikin's `up` value updates `Info.module_online`; `online` updates the air-conditioner reachability indicator under `Status`. If the module disconnects, both indicators become false until fresh status reports arrive.
-- Generic JSON control, arbitrary commands, and single or bulk settings.
-- No dependency on the ioBroker MQTT adapter for Faikin connections.
+- Built-in MQTT broker with configurable port and bind address, plus optional username and password.
+- Multiple Faikin modules per adapter instance, each with its own device folder.
+- Automatic datapoints for reported status values and MQTT messages.
+- Writable controls are created only for functions reported by each module.
+- Separate indicators for Faikin module reachability and air-conditioner reachability.
+- Energy counters and consumption history in kWh.
+- The ioBroker MQTT adapter is not required for Faikin modules to connect.
 
-## Installation from GitHub
+## Object structure
 
-Once this repository is public, install it in ioBroker Admin using **Adapters → Custom Install → Any URL** and enter:
+Each module has its own folder named after its hostname:
 
-`https://github.com/BeSiRe1/ioBroker.faikin`
+```text
+<hostname>
+├─ Status       climate values and operating state
+├─ Info         Faikin module information
+├─ Energy       energy counters and consumption history
+├─ Control      supported controls
+├─ Commands     one-time actions
+└─ MQTT         received MQTT messages
+```
 
-The command line alternative is `iob url https://github.com/BeSiRe1/ioBroker.faikin`.
+MQTT topics without a device hostname are stored in the adapter-level `General.MQTT` folder. The adapter-level `info.connection` state lists connected MQTT client hostnames.
 
-## Configuration
+## Energy consumption
 
-1. Choose a free MQTT port. The default is `1884`, which can coexist with a broker already using `1883`.
-2. Set a username and password; use the same credentials on every Faikin module.
-3. In each module's MQTT settings, enter the ioBroker server's LAN address, the configured port, and the credentials.
-4. Set a unique hostname for each module under **WiFi settings** in its Faikin interface. The adapter discovers each module by its MQTT hostname and creates separate objects under `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands`, and `<hostname>.MQTT`. General MQTT topics without a device hostname are stored in `General.MQTT`.
-5. Enable **Live status** (`livestatus`) in the Faikin web interface so status changes are reported promptly.
+Under `<hostname>.Energy`:
 
-The broker uses unencrypted MQTT and should only be reachable on a trusted local network. Do not forward its port from the internet. The fields each air conditioner reports depend on its model and firmware; newly received fields and topics are added automatically.
+- `Total`: cumulative total, heating, and cooling counters reported by Faikin, in kWh.
+- `Current.Day`, `Current.Month`, and `Current.Year`: calculated consumption for the current day, month, and year, each split into total, heating, and cooling.
+- `History.day`, `History.month`, and `History.year`: JSON lists of completed daily, monthly, and yearly values. Each entry contains its period and total, heating, and cooling consumption in kWh.
+
+Consumption is calculated from changes in the energy counters reported by Faikin. Recording begins when the adapter receives the counters. Past periods cannot be reconstructed, so the first period in progress is incomplete.
+
+## Setup
+
+1. In ioBroker Admin, open **Adapters → Custom Install → Any URL** and enter `https://github.com/BeSiRe1/ioBroker.faikin`.
+2. Choose an unused MQTT port. The default is `1884`.
+3. If needed, set an MQTT username and password in the adapter settings.
+4. In each Faikin module's MQTT settings, enter the ioBroker server's LAN address, the adapter port, and the same credentials.
+5. Assign each module a unique hostname under **WiFi settings** in the Faikin interface.
+6. Enable **Live status** (`livestatus`) in the Faikin interface so the adapter receives status changes promptly.
+
+The broker uses unencrypted MQTT. Keep it on a trusted local network and do not expose its port to the internet. Available values depend on the air-conditioner model and firmware.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for the version history.
+See [CHANGELOG.md](CHANGELOG.md) for changes by version.
 
 ## Development
 
-Requirements: Node.js 22.19 or newer.
+Requirement: Node.js 22.19 or newer.
 
 ```sh
 npm install
 npm test
 ```
-
-The tests validate the adapter package and start it against an ioBroker controller test environment. GitHub Actions runs them on Node.js 22 and 24.
 
 ## License
 
@@ -57,43 +70,71 @@ MIT. See [LICENSE](LICENSE).
 
 ---
 
-# Faikin (Deutsch)
+# Faikin für ioBroker
 
-Ein ioBroker-Adapter für Daikin-Klimaanlagen mit Faikin-/Faikout-Firmware. Der Adapter enthält einen eigenen MQTT-Broker, mit dem sich die Module direkt verbinden. Eine Adapterinstanz kann mehrere Module aufnehmen. Jedes Faikin-Modul benötigt einen eigenen Hostnamen. Dieser wird in der Faikin-Oberfläche unter **WiFi settings** festgelegt und von Faikin sowohl für DHCP als auch für MQTT verwendet.
+Der Adapter verbindet Faikin-/Faikout-Module mit ioBroker und stellt einen eigenen MQTT-Broker bereit. Eine Adapterinstanz kann mehrere Faikin-/Faikout-Module verwalten. Jedes Modul benötigt einen eigenen Hostnamen, den du in der Faikin-Oberfläche unter **WiFi settings** einstellst.
 
-Informationen zur Einrichtung und Firmware stehen in der [offiziellen Faikin-Dokumentation](https://www.faikin.au/pages/instructions).
+Informationen zur Einrichtung des Moduls findest du in der [offiziellen Faikin-Dokumentation](https://www.faikin.au/pages/instructions).
 
 ## Funktionen
 
-- Integrierter MQTT-Broker mit änderbarem Port, Bind-Adresse und optionalen Zugangsdaten.
-- Automatische Erkennung von Faikin-/Faikout-Hostnamen mit getrennten Geräteordnern.
-- Allgemeine MQTT-Themen ohne Geräte-Hostname landen im festen Ordner `General`, der nicht als Gerät mit Online-Anzeige angelegt wird.
-- Der adapterweite Datenpunkt `info.connection` listet die verbundenen Faikin-Hostnamen auf. Die Erreichbarkeit jedes Moduls und die Antwort der Klimaanlage werden separat angezeigt.
-- Dynamische Datenpunkte für alle vom Gerät empfangenen Statusfelder und MQTT-Themen.
-- Steuerpunkte werden nur für Funktionen angelegt, die das Modul in seinen Statusdaten meldet: Ein/Aus, Solltemperatur, Modus, Lüfter, Lamellen, Auto-Modus, Zeitpläne und unterstützte Zusatzfunktionen. Temperaturgrenzen und Schrittweite der Solltemperatur werden – sofern verfügbar – aus Faikins Home-Assistant-MQTT-Erkennung übernommen.
-- Eindeutige Objektordner pro Gerät: `Status` für Klimawerte, `Info` für Modulinformationen, `Energy` für Energiezähler und Verbrauchsverläufe, `Control` für einstellbare Werte, `Commands` für einmalige Aktionen und `MQTT` für empfangene Nachrichten.
-- Energiewerte sind unter `Energy` zusammengefasst: Die Faikin-Zähler und der aktuelle Verbrauch für Tag, Monat und Jahr werden in kWh angezeigt. Abgeschlossene Tages-, Monats- und Jahreswerte bleiben in drei JSON-Verlaufsdatenpunkten erhalten.
-- Klimastatuswerte liegen unter `Status`; Geräte- und Modulinformationen unter `Info`, auch wenn bekannte Informationsfelder im Status-Payload eintreffen. IDs, Namen und Einheiten bleiben unverändert. Speichergrößen werden in Byte angezeigt. Faikins Wert `up` aktualisiert `Info.module_online`; `online` aktualisiert die Erreichbarkeit der Klimaanlage unter `Status`. Bei einer Modultrennung werden beide Anzeigen auf „false“ gesetzt, bis neue Statusmeldungen eintreffen.
-- Allgemeine JSON-Steuerung, freie Befehle und einzelne oder gebündelte Einstellungen.
-- Der MQTT-Adapter ist für die Faikin-Verbindung nicht erforderlich.
+- Integrierter MQTT-Broker mit einstellbarem Port und Bind-Adresse sowie optionalem Benutzernamen und Passwort.
+- Mehrere Faikin-Module pro Adapterinstanz, jeweils mit eigenem Geräteordner.
+- Automatisch angelegte Datenpunkte für gemeldete Statuswerte und MQTT-Nachrichten.
+- Steuerdatenpunkte nur für Funktionen, die das jeweilige Modul meldet.
+- Getrennte Anzeigen für die Erreichbarkeit des Faikin-Moduls und der Klimaanlage.
+- Energiezähler und Verbrauchsverläufe in kWh.
+- Der ioBroker-MQTT-Adapter wird für die Verbindung der Faikin-Module nicht benötigt.
 
-## Installation von GitHub
+## Objektstruktur
 
-Sobald dieses Repository öffentlich ist, lässt es sich im ioBroker Admin unter **Adapter → Benutzerdefinierte Installation → Beliebige URL** installieren. Dort die GitHub-Adresse von `ioBroker.faikin` eintragen.
+Jedes Modul erhält einen eigenen Ordner unter seinem Hostnamen:
+
+```text
+<hostname>
+├─ Status       Klimawerte und Betriebszustand
+├─ Info         Informationen zum Faikin-Modul
+├─ Energy       Energiezähler und Verbrauchsverläufe
+├─ Control      unterstützte Steuerungen
+├─ Commands     einmalige Aktionen
+└─ MQTT         empfangene MQTT-Nachrichten
+```
+
+MQTT-Themen ohne Geräte-Hostname stehen im adapterweiten Ordner `General.MQTT`. Der adapterweite Datenpunkt `info.connection` enthält die Hostnamen der verbundenen MQTT-Clients.
+
+## Energieverbrauch
+
+Unter `<hostname>.Energy` findest du:
+
+- `Total`: die von Faikin gemeldeten Gesamt-, Heiz- und Kühlenergiezähler in kWh.
+- `Current.Day`, `Current.Month` und `Current.Year`: den berechneten Verbrauch für den aktuellen Tag, Monat und das aktuelle Jahr, jeweils gesamt sowie für Heizen und Kühlen.
+- `History.day`, `History.month` und `History.year`: JSON-Listen mit abgeschlossenen Tages-, Monats- und Jahreswerten. Jeder Eintrag enthält den Zeitraum sowie Gesamt-, Heiz- und Kühlverbrauch in kWh.
+
+Die Verbräuche werden aus den Änderungen der von Faikin gemeldeten Energiezähler berechnet. Die Aufzeichnung beginnt, sobald der Adapter die Zählerstände empfängt. Bereits vergangene Zeiträume können nicht nachträglich rekonstruiert werden; der erste noch laufende Zeitraum ist daher unvollständig.
 
 ## Einrichtung
 
-1. Einen freien MQTT-Port festlegen. Standard ist `1884`, damit ein bereits auf Port `1883` laufender Broker daneben laufen kann.
-2. Benutzername und Passwort setzen und dieselben Zugangsdaten in allen Faikin-Modulen eintragen.
-3. In jedem Faikin-MQTT-Menü die LAN-Adresse des ioBroker-Servers, den Port und die Zugangsdaten eintragen.
-4. Weise jedem Modul in der Faikin-Oberfläche unter **WiFi settings** einen eindeutigen Hostnamen zu. Der Adapter erkennt jedes Modul anhand dieses MQTT-Hostnamens und legt dafür getrennte Objekte unter `<hostname>.Status`, `<hostname>.Info`, `<hostname>.Control`, `<hostname>.Commands` und `<hostname>.MQTT` an. Allgemeine MQTT-Themen ohne Geräte-Hostname erscheinen unter `General.MQTT`.
-5. Aktiviere **Live status** (`livestatus`) in der Faikin-Weboberfläche, damit Statusänderungen zeitnah gemeldet werden.
+1. Installiere den Adapter über **Adapter → Benutzerdefinierte Installation → Beliebige URL** und gib `https://github.com/BeSiRe1/ioBroker.faikin` ein.
+2. Wähle einen freien MQTT-Port. Standardmäßig ist Port `1884` eingestellt.
+3. Lege bei Bedarf MQTT-Benutzername und Passwort in den Adaptereinstellungen fest.
+4. Trage in jedem Faikin-Modul unter den MQTT-Einstellungen die LAN-Adresse des ioBroker-Servers, den Adapter-Port und dieselben Zugangsdaten ein.
+5. Vergib in der Faikin-Oberfläche unter **WiFi settings** für jedes Modul einen eigenen Hostnamen.
+6. Aktiviere **Live status** (`livestatus`) in der Faikin-Oberfläche, damit der Adapter Statusänderungen zeitnah empfängt.
 
-Der Broker verwendet unverschlüsseltes MQTT und sollte nur im vertrauenswürdigen lokalen Netzwerk erreichbar sein. Den Port nicht aus dem Internet freigeben. Welche Werte das jeweilige Klimagerät meldet, hängt von Modell und Firmware ab; neu empfangene Felder und Themen werden automatisch ergänzt.
+Der Broker verwendet unverschlüsseltes MQTT. Betreibe ihn nur in einem vertrauenswürdigen lokalen Netzwerk und gib seinen Port nicht für Zugriffe aus dem Internet frei. Welche Werte verfügbar sind, hängt vom Klimaanlagenmodell und der Firmware ab.
 
 ## Versionsverlauf
 
-Der Versionsverlauf steht in der [CHANGELOG.md](CHANGELOG.md).
+Die Änderungen pro Version stehen in der [CHANGELOG.md](CHANGELOG.md).
+
+## Entwicklung
+
+Voraussetzung: Node.js 22.19 oder neuer.
+
+```sh
+npm install
+npm test
+```
 
 ## Lizenz
 
