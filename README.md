@@ -12,7 +12,8 @@ For device setup and firmware documentation, see the [official Faikin documentat
 - The adapter-level `info.connection` state lists connected Faikin hostnames. Each device's module reachability and the air conditioner's response are shown separately.
 - Dynamic datapoints for every status field and MQTT topic received from a device.
 - Writable controls are created only for fields the module reports as supported, including power, target temperature, mode, fan, louvre swing, auto mode, schedules, and any reported extra functions. Target temperature limits and step size are read from Faikin's Home Assistant MQTT discovery message when available.
-- Clear object folders per device: `Status` for reported values, `Control` for writable settings, `Commands` for one-time actions, and `MQTT` for received messages.
+- Clear object folders per device: `Status` for climate values, `Info` for module details, `Energy` for energy counters and consumption history, `Control` for writable settings, `Commands` for one-time actions, and `MQTT` for received messages.
+- Energy data is grouped under `Energy`: cumulative Faikin counters and current day/month/year consumption are shown in kWh; completed day, month, and year values are retained in three JSON history states.
 - Climate status values go under `Status`; device and module information goes under `Info`, including known information fields delivered in a state payload. IDs, names, and units remain unchanged. Memory sizes are shown in bytes. Faikin's `up` value updates `Info.module_online`; `online` updates the air-conditioner reachability indicator under `Status`. If the module disconnects, both indicators become false until fresh status reports arrive.
 - Generic JSON control, arbitrary commands, and single or bulk settings.
 - No dependency on the ioBroker MQTT adapter for Faikin connections.
@@ -70,7 +71,8 @@ Informationen zur Einrichtung und Firmware stehen in der [offiziellen Faikin-Dok
 - Der adapterweite Datenpunkt `info.connection` listet die verbundenen Faikin-Hostnamen auf. Die Erreichbarkeit jedes Moduls und die Antwort der Klimaanlage werden separat angezeigt.
 - Dynamische Datenpunkte für alle vom Gerät empfangenen Statusfelder und MQTT-Themen.
 - Steuerpunkte werden nur für Funktionen angelegt, die das Modul in seinen Statusdaten meldet: Ein/Aus, Solltemperatur, Modus, Lüfter, Lamellen, Auto-Modus, Zeitpläne und unterstützte Zusatzfunktionen. Temperaturgrenzen und Schrittweite der Solltemperatur werden – sofern verfügbar – aus Faikins Home-Assistant-MQTT-Erkennung übernommen.
-- Eindeutige Objektordner pro Gerät: `Status` für gemeldete Werte, `Control` für einstellbare Werte, `Commands` für einmalige Aktionen und `MQTT` für empfangene Nachrichten.
+- Eindeutige Objektordner pro Gerät: `Status` für Klimawerte, `Info` für Modulinformationen, `Energy` für Energiezähler und Verbrauchsverläufe, `Control` für einstellbare Werte, `Commands` für einmalige Aktionen und `MQTT` für empfangene Nachrichten.
+- Energiewerte sind unter `Energy` zusammengefasst: Die Faikin-Zähler und der aktuelle Verbrauch für Tag, Monat und Jahr werden in kWh angezeigt. Abgeschlossene Tages-, Monats- und Jahreswerte bleiben in drei JSON-Verlaufsdatenpunkten erhalten.
 - Klimastatuswerte liegen unter `Status`; Geräte- und Modulinformationen unter `Info`, auch wenn bekannte Informationsfelder im Status-Payload eintreffen. IDs, Namen und Einheiten bleiben unverändert. Speichergrößen werden in Byte angezeigt. Faikins Wert `up` aktualisiert `Info.module_online`; `online` aktualisiert die Erreichbarkeit der Klimaanlage unter `Status`. Bei einer Modultrennung werden beide Anzeigen auf „false“ gesetzt, bis neue Statusmeldungen eintreffen.
 - Allgemeine JSON-Steuerung, freie Befehle und einzelne oder gebündelte Einstellungen.
 - Der MQTT-Adapter ist für die Faikin-Verbindung nicht erforderlich.

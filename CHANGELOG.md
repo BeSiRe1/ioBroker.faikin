@@ -2,6 +2,7 @@
 
 ## 0.1.2 (2026-10-02)
 
+- Group Faikin energy counters, current day/month/year consumption, and retained daily/monthly/yearly JSON histories under `Energy`; display all energy values in kWh.
 - Create writable controls only when a Faikin module reports the corresponding capability.
 - Read target temperature limits and step size from Faikin Home Assistant MQTT discovery when available.
 - Add the additional reported controls for presets, demand, sensor, display LED, and humidification.

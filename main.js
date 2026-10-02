@@ -58,7 +58,12 @@ const ID_MAP = {
 const UNITS = {
     home: '°C', outside: '°C', liquid: '°C', inlet: '°C', temp: '°C', autot: '°C', autor: '°C', env: '°C',
     comp: 'Hz', hum: '%', demand: '%', rssi: 'dBm', uptime: 's', 'mqtt-up': 's', fanrpm: 'U/min', anglev: '°',
-    flash: 'B', mem: 'B', spi: 'B', Whoutside: 'Wh', Whheating: 'Wh', Whcooling: 'Wh', consumption: 'W'
+    flash: 'B', mem: 'B', spi: 'B', Whoutside: 'kWh', Whheating: 'kWh', Whcooling: 'kWh', consumption: 'W'
+};
+const ENERGY_FIELDS = {
+    Whoutside: { id: 'total', label: 'Gesamtenergieverbrauch', historyKey: 'total' },
+    Whheating: { id: 'heating', label: 'Heizenergieverbrauch', historyKey: 'heating' },
+    Whcooling: { id: 'cooling', label: 'Kühlenergieverbrauch', historyKey: 'cooling' }
 };
 const MODES = { H: 'Heizen', C: 'Kühlen', A: 'Auto', D: 'Trocknen', F: 'Nur Lüfter' };
 const FANS = { A: 'Auto', Q: 'Nacht/Leise', '1': 'Stufe 1', '2': 'Stufe 2', '3': 'Stufe 3', '4': 'Stufe 4', '5': 'Stufe 5' };
@@ -114,6 +119,8 @@ class FaikinAdapter extends utils.Adapter {
         this.controlObjects = new Set();
         this.shuttingDown = false;
         this.temperatureRanges = new Map();
+        this.energyData = new Map();
+        this.energyRolloverTimer = null;
         this.on('ready', () => this.onReady());
         this.on('stateChange', (id, state) => this.onStateChange(id, state));
         this.on('unload', callback => this.onUnload(callback));
@@ -129,6 +136,7 @@ class FaikinAdapter extends utils.Adapter {
         await this.setStateAsync('info.connection', '', true);
         await this.createGeneralFolder();
         this.subscribeStates('*');
+        this.scheduleEnergyRollover();
         await this.startBroker();
         this.log.info(`Faikin-MQTT-Broker lauscht auf ${this.config.bind}:${this.config.port}; automatische Geräteerkennung aktiv.`);
     }
@@ -174,6 +182,7 @@ class FaikinAdapter extends utils.Adapter {
         await this.setObjectNotExistsAsync(`${deviceId}.MQTT`, {
             type: 'channel', common: { name: 'MQTT-Nachrichten' }, native: {}
         });
+        await this.createEnergyObjects(deviceId);
         await this.setObjectNotExistsAsync(`${deviceId}.Info.module_online`, { type: 'state', common: { name: 'Faikin-Modul online', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
         await this.extendObjectAsync(`${deviceId}.Info.module_online`, { common: { name: 'Faikin-Modul online', role: 'indicator.reachable' } });
         await this.setObjectNotExistsAsync(`${deviceId}.Status.air_conditioner_reachable`, { type: 'state', common: { name: STATUS_LABELS.online, type: 'boolean', role: 'indicator', read: true, write: false }, native: {} });
@@ -200,6 +209,173 @@ class FaikinAdapter extends utils.Adapter {
         for (const [id, name, type, role] of generic) {
             await this.setObjectNotExistsAsync(`${deviceId}.Commands.${id}`, { type: 'state', common: { name, type, role, read: true, write: true }, native: {} });
         }
+    }
+
+    async createEnergyObjects(deviceId) {
+        const channels = [
+            ['Energy', 'Energieverbrauch'],
+            ['Energy.Total', 'Faikin-Zähler'],
+            ['Energy.Current', 'Aktueller Verbrauch'],
+            ['Energy.Current.Day', 'Heute'],
+            ['Energy.Current.Month', 'Dieser Monat'],
+            ['Energy.Current.Year', 'Dieses Jahr'],
+            ['Energy.History', 'Verlauf']
+        ];
+        for (const [id, name] of channels) {
+            await this.setObjectNotExistsAsync(`${deviceId}.${id}`, { type: 'channel', common: { name }, native: {} });
+        }
+        for (const definition of Object.values(ENERGY_FIELDS)) {
+            const totalId = `${deviceId}.Energy.Total.${definition.id}`;
+            await this.setObjectNotExistsAsync(totalId, {
+                type: 'state', common: { name: definition.label, type: 'number', role: 'value', unit: 'kWh', read: true, write: false, def: 0 }, native: {}
+            });
+            if (!(await this.getStateAsync(totalId))) await this.setStateAsync(totalId, 0, true);
+            for (const period of ['Day', 'Month', 'Year']) {
+                const label = period === 'Day' ? 'heute' : period === 'Month' ? 'diesen Monat' : 'dieses Jahr';
+                const currentId = `${deviceId}.Energy.Current.${period}.${definition.id}`;
+                await this.setObjectNotExistsAsync(currentId, {
+                    type: 'state', common: { name: `${definition.label} ${label}`, type: 'number', role: 'value', unit: 'kWh', read: true, write: false, def: 0 }, native: {}
+                });
+                if (!(await this.getStateAsync(currentId))) await this.setStateAsync(currentId, 0, true);
+            }
+        }
+        for (const [period, name] of [['day', 'Tagesverlauf (JSON)'], ['month', 'Monatsverlauf (JSON)'], ['year', 'Jahresverlauf (JSON)']]) {
+            const historyId = `${deviceId}.Energy.History.${period}`;
+            await this.setObjectNotExistsAsync(historyId, {
+                type: 'state', common: { name, type: 'string', role: 'json', read: true, write: false, def: '[]' }, native: {}
+            });
+            if (!(await this.getStateAsync(historyId))) await this.setStateAsync(historyId, '[]', true);
+        }
+    }
+
+    energyPeriodKeys(date = new Date()) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return { day: `${year}-${month}-${day}`, month: `${year}-${month}`, year: String(year) };
+    }
+
+    emptyEnergyData(date = new Date()) {
+        const keys = this.energyPeriodKeys(date);
+        const emptyValues = () => ({ total: 0, heating: 0, cooling: 0 });
+        return {
+            lastRawWh: {},
+            periodKeys: keys,
+            periodWh: { day: emptyValues(), month: emptyValues(), year: emptyValues() }
+        };
+    }
+
+    async loadEnergyData(hostname) {
+        if (this.energyData.has(hostname)) return this.energyData.get(hostname);
+        const root = this.rootFor(hostname);
+        const object = await this.getObjectAsync(root);
+        const saved = object?.native?.energyProcessing;
+        const data = saved && typeof saved === 'object' ? saved : this.emptyEnergyData();
+        const defaults = this.emptyEnergyData();
+        data.lastRawWh = data.lastRawWh && typeof data.lastRawWh === 'object' ? data.lastRawWh : {};
+        data.periodKeys = data.periodKeys && typeof data.periodKeys === 'object' ? data.periodKeys : defaults.periodKeys;
+        data.periodWh = data.periodWh && typeof data.periodWh === 'object' ? data.periodWh : defaults.periodWh;
+        for (const period of ['day', 'month', 'year']) {
+            data.periodWh[period] = { ...defaults.periodWh[period], ...(data.periodWh[period] || {}) };
+        }
+        this.energyData.set(hostname, data);
+        return data;
+    }
+
+    async saveEnergyData(hostname, data) {
+        const root = this.rootFor(hostname);
+        const object = await this.getObjectAsync(root);
+        await this.extendObjectAsync(root, { native: { ...(object?.native || {}), energyProcessing: data } });
+    }
+
+    async appendEnergyHistory(hostname, period, periodKey, valuesWh) {
+        const root = this.rootFor(hostname);
+        const id = `${root}.Energy.History.${period}`;
+        const state = await this.getStateAsync(id);
+        let records;
+        try {
+            records = Array.isArray(JSON.parse(state?.val || '[]')) ? JSON.parse(state?.val || '[]') : [];
+        } catch {
+            records = [];
+        }
+        const item = period === 'year' ? { year: Number(periodKey) } : period === 'month' ? { month: periodKey } : { date: periodKey };
+        item.totalKWh = Number((valuesWh.total / 1000).toFixed(3));
+        item.heatingKWh = Number((valuesWh.heating / 1000).toFixed(3));
+        item.coolingKWh = Number((valuesWh.cooling / 1000).toFixed(3));
+        const keyName = period === 'year' ? 'year' : period === 'month' ? 'month' : 'date';
+        const existing = records.findIndex(record => record && record[keyName] === item[keyName]);
+        if (existing >= 0) records[existing] = item;
+        else records.push(item);
+        await this.setStateAsync(id, JSON.stringify(records), true);
+    }
+
+    async writeEnergyCurrent(hostname, data, onlyMetric = null) {
+        const root = this.rootFor(hostname);
+        for (const [period, folder] of [['day', 'Day'], ['month', 'Month'], ['year', 'Year']]) {
+            for (const metric of ['total', 'heating', 'cooling']) {
+                if (onlyMetric && metric !== onlyMetric) continue;
+                const value = Number((data.periodWh[period][metric] / 1000).toFixed(3));
+                await this.updateEnergyPoint(`${root}.Energy.Current.${folder}.${metric}`, value);
+            }
+        }
+    }
+
+    async updateEnergyPoint(id, value) {
+        const current = await this.getStateAsync(id);
+        if (!current || current.val !== value || current.ack !== true) await this.setStateAsync(id, value, true);
+    }
+
+    async rollEnergyPeriods(hostname, date = new Date()) {
+        const data = await this.loadEnergyData(hostname);
+        const nextKeys = this.energyPeriodKeys(date);
+        let changed = false;
+        for (const period of ['day', 'month', 'year']) {
+            if (data.periodKeys[period] === nextKeys[period]) continue;
+            if (data.periodKeys[period]) await this.appendEnergyHistory(hostname, period, data.periodKeys[period], data.periodWh[period]);
+            data.periodKeys[period] = nextKeys[period];
+            data.periodWh[period] = { total: 0, heating: 0, cooling: 0 };
+            changed = true;
+        }
+        if (changed) {
+            await this.writeEnergyCurrent(hostname, data);
+            await this.saveEnergyData(hostname, data);
+        }
+    }
+
+    async writeEnergyValue(hostname, key, value) {
+        const definition = ENERGY_FIELDS[key];
+        const root = this.rootFor(hostname);
+        const rawWh = Number(value);
+        if (!Number.isFinite(rawWh)) {
+            await this.writeValue(`${root}.Energy.Total.${definition.id}`, value, definition.label, 'kWh');
+            return;
+        }
+        const data = await this.loadEnergyData(hostname);
+        await this.rollEnergyPeriods(hostname);
+        const previous = data.lastRawWh[definition.historyKey];
+        const delta = Number.isFinite(previous) && rawWh >= previous ? rawWh - previous : 0;
+        data.lastRawWh[definition.historyKey] = rawWh;
+        for (const period of ['day', 'month', 'year']) data.periodWh[period][definition.historyKey] += delta;
+        const totalKWh = Number((rawWh / 1000).toFixed(3));
+        await this.updateEnergyPoint(`${root}.Energy.Total.${definition.id}`, totalKWh);
+        await this.writeEnergyCurrent(hostname, data, definition.historyKey);
+        await this.saveEnergyData(hostname, data);
+    }
+
+    scheduleEnergyRollover() {
+        if (this.energyRolloverTimer) clearTimeout(this.energyRolloverTimer);
+        const nextMidnight = new Date();
+        nextMidnight.setHours(24, 0, 0, 100);
+        this.energyRolloverTimer = setTimeout(async () => {
+            for (const hostname of this.deviceRoots.keys()) {
+                try {
+                    await this.rollEnergyPeriods(hostname, new Date());
+                } catch (error) {
+                    this.log.warn(`Energieverlauf ${hostname}: ${error.message || error}`);
+                }
+            }
+            this.scheduleEnergyRollover();
+        }, Math.max(1, nextMidnight.getTime() - Date.now()));
     }
 
     async startBroker() {
@@ -424,6 +600,10 @@ class FaikinAdapter extends utils.Adapter {
             await this.writeInfoValue(hostname, key, value, `state/${hostname}/${key}`);
             return;
         }
+        if (ENERGY_FIELDS[key]) {
+            await this.writeEnergyValue(hostname, key, value);
+            return;
+        }
         const root = this.rootFor(hostname);
         if (key === 'online' && value === true) {
             const moduleState = await this.getStateAsync(`${root}.Info.module_online`);
@@ -558,6 +738,7 @@ class FaikinAdapter extends utils.Adapter {
 
     onUnload(callback) {
         this.shuttingDown = true;
+        if (this.energyRolloverTimer) clearTimeout(this.energyRolloverTimer);
         for (const timer of this.commandTimers.values()) clearTimeout(timer);
         this.commandTimers.clear();
         const connectedHostnames = this.clients ? [...new Set([...this.clients.values()].filter(Boolean))] : [];

@@ -4,8 +4,8 @@
     "version": "0.1.2",
     "news": {
       "0.1.2": {
-        "en": "Create controls based on each module's reported fields, use Faikin Home Assistant discovery for target temperature limits, derive reachability correctly, add explicit units, and separate climate status from device/module information.",
-        "de": "Steuerungen anhand der gemeldeten Modulfelder anlegen, Temperaturgrenzen aus Faikins Home-Assistant-Erkennung übernehmen, die Erreichbarkeit korrekt bestimmen, Einheiten ergänzen und Klimastatus von Geräte- und Modulinformationen trennen."
+        "en": "Group energy counters and current day/month/year consumption under Energy, keep completed period histories as JSON, and display energy values in kWh. Create controls based on reported fields, use Faikin discovery for temperature limits, and distinguish module and air-conditioner reachability.",
+        "de": "Energiezähler und aktuellen Tages-, Monats- und Jahresverbrauch unter Energy gruppieren, abgeschlossene Zeiträume als JSON-Verläufe speichern und Energiewerte in kWh anzeigen. Steuerungen anhand gemeldeter Felder anlegen, Temperaturgrenzen aus Faikins Erkennung übernehmen und Modul- von Klima-Erreichbarkeit unterscheiden."
       },
       "0.1.1": {
         "en": "Configure the embedded MQTT broker, discover multiple modules, list connected Faikin hostnames, and separate module reachability from air-conditioner reachability.",
