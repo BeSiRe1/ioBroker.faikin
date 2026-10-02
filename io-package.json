@@ -4,8 +4,8 @@
     "version": "0.1.2",
     "news": {
       "0.1.2": {
-        "en": "Create controls based on each module's reported fields, use Faikin Home Assistant discovery for target temperature limits, derive reachability correctly, add explicit units, and place raw values by MQTT topic family while keeping reachability indicators in Status.",
-        "de": "Steuerungen anhand der gemeldeten Modulfelder anlegen, Temperaturgrenzen aus Faikins Home-Assistant-Erkennung übernehmen, die Erreichbarkeit korrekt bestimmen, Einheiten ergänzen und Rohwerte nach MQTT-Themen einsortieren; Erreichbarkeitsanzeigen bleiben unter Status."
+        "en": "Create controls based on each module's reported fields, use Faikin Home Assistant discovery for target temperature limits, derive reachability correctly, add explicit units, and separate climate status from device/module information.",
+        "de": "Steuerungen anhand der gemeldeten Modulfelder anlegen, Temperaturgrenzen aus Faikins Home-Assistant-Erkennung übernehmen, die Erreichbarkeit korrekt bestimmen, Einheiten ergänzen und Klimastatus von Geräte- und Modulinformationen trennen."
       },
       "0.1.1": {
         "en": "Configure the embedded MQTT broker, discover multiple modules, list connected Faikin hostnames, and separate module reachability from air-conditioner reachability.",

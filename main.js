@@ -36,6 +36,10 @@ const INFO_ID_MAP = {
     flash: 'flash_size', id: 'device_id', mem: 'free_memory', rst: 'restart_code', spi: 'free_spi_memory',
     up: 'module_online', online: 'air_conditioner_reachable'
 };
+const INFO_FIELDS = new Set([
+    'app', 'bssid', 'build', 'build-suffix', 'chan', 'control', 'flash', 'id', 'ipv4', 'ipv6', 'mem',
+    'mqtt-up', 'protocol', 'rst', 'rssi', 'spi', 'ssid', 'ts', 'uptime', 'version'
+]);
 const ID_MAP = {
     online: 'air_conditioner_reachable', power: 'power', heat: 'heating_active', home: 'room_temperature',
     outside: 'outside_temperature', liquid: 'coolant_feed_temperature', inlet: 'intake_air_temperature',
@@ -395,8 +399,13 @@ class FaikinAdapter extends utils.Adapter {
 
     async writeStatusValue(hostname, key, value) {
         if (key === 'up') {
+            await this.writeInfoValue(hostname, key, value, `state/${hostname}/${key}`);
             if (typeof value === 'boolean') await this.setModuleOnline(hostname, value);
             else if (value === 0 || value === 1) await this.setModuleOnline(hostname, value === 1);
+            return;
+        }
+        if (INFO_FIELDS.has(key)) {
+            await this.writeInfoValue(hostname, key, value, `state/${hostname}/${key}`);
             return;
         }
         const root = this.rootFor(hostname);
