@@ -25,7 +25,7 @@ const INFO_LABELS = {
     flash: 'Flash-Größe', id: 'Geräte-ID', ipv4: 'IPv4-Adresse', ipv6: 'IPv6-Adresse',
     mem: 'Freier Speicher', 'mqtt-up': 'MQTT-Laufzeit', protocol: 'Kommunikationsprotokoll',
     rst: 'Neustartcode', rssi: 'WLAN-Signalstärke', spi: 'Freier SPI-Speicher', ssid: 'WLAN-Name (SSID)',
-    ts: 'Zeitstempel (Faikin)', uptime: 'Betriebszeit', version: 'Firmware-Version',
+    ts: 'Zeitstempel (Faikin)', uptime: 'Faikin-Modul-Betriebszeit', version: 'Firmware-Version',
     online: 'Klimaanlage erreichbar'
 };
 const INFO_ID_MAP = {
@@ -112,6 +112,7 @@ class FaikinAdapter extends utils.Adapter {
         this.deviceSetups = new Map();
         this.rootHosts = new Map();
         this.controlObjects = new Set();
+        this.shuttingDown = false;
         this.temperatureRanges = new Map();
         this.on('ready', () => this.onReady());
         this.on('stateChange', (id, state) => this.onStateChange(id, state));
@@ -219,7 +220,7 @@ class FaikinAdapter extends utils.Adapter {
         this.broker.on('clientReady', client => {
             this.clients.set(client.id, null);
             this.log.info(`MQTT-Client verbunden: ${client.id}`);
-            this.updateConnectedClientsState();
+            this.updateConnectedClientsState().catch(error => this.log.error(`Verbundene Clients: ${error.message || error}`));
         });
         this.broker.on('clientDisconnect', client => {
             this.handleClientDisconnect(client).catch(error => this.log.error(`MQTT-Trennung ${client.id}: ${error.message || error}`));
@@ -238,23 +239,38 @@ class FaikinAdapter extends utils.Adapter {
         });
     }
 
-    updateConnectedClientsState() {
-        if (!this.clients) return;
+    async updateConnectedClientsState() {
+        if (!this.clients || this.shuttingDown) return;
         const hostnames = [...new Set([...this.clients.values()].filter(Boolean))].sort((a, b) => a.localeCompare(b));
-        this.setState('info.connection', hostnames.join(', '), true);
+        await this.setObjectNotExistsAsync('info.connection', {
+            type: 'state',
+            common: { name: 'Liste der verbundenen Clients', type: 'string', role: 'text', read: true, write: false, def: '' },
+            native: {}
+        });
+        await this.setStateAsync('info.connection', hostnames.join(', '), true);
     }
 
     async handleClientDisconnect(client) {
         const hostname = this.clients?.get(client.id);
         this.clients?.delete(client.id);
         this.log.info(`MQTT-Client getrennt: ${client.id}`);
-        this.updateConnectedClientsState();
+        await this.updateConnectedClientsState();
         if (hostname && ![...this.clients.values()].includes(hostname)) await this.setModuleOnline(hostname, false);
     }
 
     async setModuleOnline(hostname, online) {
         await this.createObjects(hostname);
         const root = this.rootFor(hostname);
+        await this.setObjectNotExistsAsync(`${root}.Info.module_online`, {
+            type: 'state',
+            common: { name: 'Faikin-Modul online', type: 'boolean', role: 'indicator.reachable', read: true, write: false },
+            native: {}
+        });
+        await this.setObjectNotExistsAsync(`${root}.Status.air_conditioner_reachable`, {
+            type: 'state',
+            common: { name: STATUS_LABELS.online, type: 'boolean', role: 'indicator', read: true, write: false },
+            native: {}
+        });
         await this.setStateAsync(`${root}.Info.module_online`, online, true);
         if (!online) await this.setStateAsync(`${root}.Status.air_conditioner_reachable`, false, true);
     }
@@ -268,7 +284,7 @@ class FaikinAdapter extends utils.Adapter {
         const hostname = topicFamilies.includes(parts[0]) && parts.length > 1 ? parts[1] : null;
         if (hostname && clientId && this.clients?.has(clientId) && this.clients.get(clientId) !== hostname) {
             this.clients.set(clientId, hostname);
-            this.updateConnectedClientsState();
+            await this.updateConnectedClientsState();
         }
         if (hostname) await this.createObjects(hostname);
         if (clientId && this.clients && !this.clients.has(clientId)) return;
@@ -371,7 +387,8 @@ class FaikinAdapter extends utils.Adapter {
         const definition = CONTROL_DEFINITIONS[controlId];
         if (!definition) return;
         const id = `${this.rootFor(hostname)}.Control.${controlId}`;
-        if (this.controlObjects.has(id)) return;
+        if (this.controlObjects.has(id) && await this.getObjectAsync(id)) return;
+        this.controlObjects.delete(id);
         const [name, type, role, def, unit, min, max, step] = definition;
         const common = { name, type, role, read: true, write: true, def };
         if (unit) common.unit = unit;
@@ -540,12 +557,12 @@ class FaikinAdapter extends utils.Adapter {
     }
 
     onUnload(callback) {
+        this.shuttingDown = true;
         for (const timer of this.commandTimers.values()) clearTimeout(timer);
         this.commandTimers.clear();
         const connectedHostnames = this.clients ? [...new Set([...this.clients.values()].filter(Boolean))] : [];
         if (this.clients) {
             this.clients.clear();
-            this.updateConnectedClientsState();
         }
         const finish = async () => {
             try {
