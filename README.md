@@ -4,13 +4,12 @@ An ioBroker adapter for Daikin air conditioners using Faikin/Faikout firmware. I
 
 For device setup and firmware documentation, see the [official Faikin documentation](https://www.faikin.au/pages/instructions).
 
-> **Development status:** Version 0.1.1 is an early development release. It needs installation and real-device testing before it should be used on a production ioBroker system.
-
 ## Features
 
 - Embedded MQTT broker with an editable port, bind address, and optional credentials.
 - Automatic discovery of Faikin/Faikout hostnames and separate device folders.
 - General MQTT topics without a device hostname go into a fixed `General` folder, not a device with an online indicator.
+- The adapter-level `info.connection` state lists connected Faikin hostnames. Each device's module reachability and the air conditioner's response are shown separately.
 - Dynamic datapoints for every status field and MQTT topic received from a device.
 - Controls for power, target temperature, mode, fan, louvre swing, supported feature switches, auto mode, and schedules.
 - Clear object folders per device: `Status` for reported values, `Control` for writable settings, `Commands` for one-time actions, and `MQTT` for received messages.
@@ -25,8 +24,6 @@ Once this repository is public, install it in ioBroker Admin using **Adapters �
 `https://github.com/BeSiRe1/ioBroker.faikin`
 
 The command line alternative is `iob url https://github.com/BeSiRe1/ioBroker.faikin`.
-
-This direct GitHub installation is for testing. Inclusion in the official ioBroker adapter list is a separate later step.
 
 ## Configuration
 
@@ -64,13 +61,12 @@ Ein ioBroker-Adapter für Daikin-Klimaanlagen mit Faikin-/Faikout-Firmware. Der 
 
 Informationen zur Einrichtung und Firmware stehen in der [offiziellen Faikin-Dokumentation](https://www.faikin.au/pages/instructions).
 
-> **Entwicklungsstand:** Version 0.1.1 ist eine frühe Entwicklungsversion. Vor dem produktiven Einsatz muss sie installiert und mit echten Geräten geprüft werden.
-
 ## Funktionen
 
 - Integrierter MQTT-Broker mit änderbarem Port, Bind-Adresse und optionalen Zugangsdaten.
 - Automatische Erkennung von Faikin-/Faikout-Hostnamen mit getrennten Geräteordnern.
 - Allgemeine MQTT-Themen ohne Geräte-Hostname landen im festen Ordner `General`, der nicht als Gerät mit Online-Anzeige angelegt wird.
+- Der adapterweite Datenpunkt `info.connection` listet die verbundenen Faikin-Hostnamen auf. Die Erreichbarkeit jedes Moduls und die Antwort der Klimaanlage werden separat angezeigt.
 - Dynamische Datenpunkte für alle vom Gerät empfangenen Statusfelder und MQTT-Themen.
 - Steuerung von Ein/Aus, Solltemperatur, Modus, Lüfter, Lamellen, unterstützten Zusatzfunktionen, Auto-Modus und Zeitplänen.
 - Eindeutige Objektordner pro Gerät: `Status` für gemeldete Werte, `Control` für einstellbare Werte, `Commands` für einmalige Aktionen und `MQTT` für empfangene Nachrichten.
@@ -81,8 +77,6 @@ Informationen zur Einrichtung und Firmware stehen in der [offiziellen Faikin-Dok
 ## Installation von GitHub
 
 Sobald dieses Repository öffentlich ist, lässt es sich im ioBroker Admin unter **Adapter → Benutzerdefinierte Installation → Beliebige URL** installieren. Dort die GitHub-Adresse von `ioBroker.faikin` eintragen.
-
-Die direkte GitHub-Installation dient zunächst zum Testen. Eine Aufnahme in die offizielle ioBroker-Adapterliste ist ein späterer eigener Schritt.
 
 ## Einrichtung
 

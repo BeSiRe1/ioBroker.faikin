@@ -95,8 +95,9 @@ class FaikinAdapter extends utils.Adapter {
     async onReady() {
         this.config = { ...DEFAULTS, ...this.config };
         await this.setObjectNotExistsAsync('info', { type: 'channel', common: { name: 'Information' }, native: {} });
-        await this.setObjectNotExistsAsync('info.connection', { type: 'state', common: { name: 'MQTT-Client verbunden', type: 'boolean', role: 'indicator.reachable', read: true, write: false }, native: {} });
-        await this.setStateAsync('info.connection', false, true);
+        await this.setObjectNotExistsAsync('info.connection', { type: 'state', common: { name: 'Liste der verbundenen Clients', type: 'string', role: 'text', read: true, write: false, def: '' }, native: {} });
+        await this.extendObjectAsync('info.connection', { common: { name: 'Liste der verbundenen Clients', type: 'string', role: 'text', read: true, write: false } });
+        await this.setStateAsync('info.connection', '', true);
         await this.createGeneralFolder();
         this.subscribeStates('*');
         await this.startBroker();
@@ -214,20 +215,20 @@ class FaikinAdapter extends utils.Adapter {
             callback(null, true);
         } });
         this.server = createServer(this.broker.handle);
-        this.clients = new Set();
+        this.clients = new Map();
         this.broker.on('clientReady', client => {
-            this.clients.add(client.id);
+            this.clients.set(client.id, null);
             this.log.info(`MQTT-Client verbunden: ${client.id}`);
-            this.setState('info.connection', true, true);
+            this.updateConnectedClientsState();
         });
         this.broker.on('clientDisconnect', client => {
             this.clients.delete(client.id);
             this.log.info(`MQTT-Client getrennt: ${client.id}`);
-            this.setState('info.connection', this.clients.size > 0, true);
+            this.updateConnectedClientsState();
         });
         this.broker.on('publish', (packet, client) => {
             if (!client || !packet.topic || packet.topic.startsWith('$SYS/')) return;
-            this.handleIncoming(packet.topic, packet.payload ? packet.payload.toString() : '')
+            this.handleIncoming(packet.topic, packet.payload ? packet.payload.toString() : '', client.id)
                 .catch(error => this.log.error(`MQTT-Thema ${packet.topic}: ${error.message || error}`));
         });
         await new Promise((resolve, reject) => {
@@ -239,10 +240,20 @@ class FaikinAdapter extends utils.Adapter {
         });
     }
 
-    async handleIncoming(topic, payload) {
+    updateConnectedClientsState() {
+        if (!this.clients) return;
+        const hostnames = [...new Set([...this.clients.values()].filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        this.setState('info.connection', hostnames.join(', '), true);
+    }
+
+    async handleIncoming(topic, payload, clientId) {
         const parts = topic.split('/');
         const topicFamilies = ['state', 'setting', 'command', 'info', 'event', 'error', 'Faikout'];
         const hostname = topicFamilies.includes(parts[0]) && parts.length > 1 ? parts[1] : null;
+        if (hostname && clientId && this.clients?.has(clientId) && this.clients.get(clientId) !== hostname) {
+            this.clients.set(clientId, hostname);
+            this.updateConnectedClientsState();
+        }
         if (hostname) await this.createObjects(hostname);
         const root = hostname ? this.rootFor(hostname) : GENERAL_FOLDER;
         const devicePrefix = hostname ? `state/${hostname}` : null;
@@ -463,6 +474,10 @@ class FaikinAdapter extends utils.Adapter {
     onUnload(callback) {
         for (const timer of this.commandTimers.values()) clearTimeout(timer);
         this.commandTimers.clear();
+        if (this.clients) {
+            this.clients.clear();
+            this.updateConnectedClientsState();
+        }
         const finish = () => {
             if (this.broker) this.broker.close(() => callback());
             else callback();

@@ -2,6 +2,7 @@
 
 ## 0.1.1 (2026-10-01)
 
+- List connected Faikin hostnames in the adapter-level connection state.
 - Discover multiple Faikin modules, separate their objects, and distinguish module reachability from air-conditioner reachability.
 - Separate controls from one-time commands and collect MQTT topics without a device hostname under `General`.
 
