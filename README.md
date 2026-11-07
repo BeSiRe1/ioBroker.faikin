@@ -123,6 +123,15 @@ Die Verbräuche werden aus den Änderungen der von Faikin gemeldeten Energiezäh
 
 Der Broker verwendet unverschlüsseltes MQTT. Betreibe ihn nur in einem vertrauenswürdigen lokalen Netzwerk und gib seinen Port nicht für Zugriffe aus dem Internet frei. Welche Werte verfügbar sind, hängt vom Klimaanlagenmodell und der Firmware ab.
 
+Installationsproblem mit npm 12
+
+npm 12 blockiert Installationen direkt aus Git standardmäßig. Dabei kann der Fehler EALLOWGIT auftreten. Auf Linux lässt sich Git für einen einzelnen Installationsaufruf freigeben:
+
+npm_config_allow_git=all iobroker url https://github.com/BeSiRe1/ioBroker.faikin
+
+Die Freigabe gilt nur für diesen Aufruf; setze sie nicht dauerhaft.
+
+
 ## Versionsverlauf
 
 Die Änderungen pro Version stehen in der [CHANGELOG.md](CHANGELOG.md).
