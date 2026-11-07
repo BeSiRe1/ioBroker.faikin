@@ -49,6 +49,14 @@ Consumption is calculated from changes in the energy counters reported by Faikin
 5. Assign each module a unique hostname under **WiFi settings** in the Faikin interface.
 6. Enable **Live status** (`livestatus`) in the Faikin interface so the adapter receives status changes promptly.
 
+### Installation problem with npm 12
+
+npm 12 blocks installations directly from Git by default. This can cause the `EALLOWGIT` error. On Linux, Git can be allowed for a single installation command:
+
+`npm_config_allow_git=all iobroker url https://github.com/BeSiRe1/ioBroker.faikin`
+
+This permission applies only to that command; do not set it permanently.
+
 The broker uses unencrypted MQTT. Keep it on a trusted local network and do not expose its port to the internet. Available values depend on the air-conditioner model and firmware.
 
 ## Changelog
@@ -121,16 +129,15 @@ Die Verbräuche werden aus den Änderungen der von Faikin gemeldeten Energiezäh
 5. Vergib in der Faikin-Oberfläche unter **WiFi settings** für jedes Modul einen eigenen Hostnamen.
 6. Aktiviere **Live status** (`livestatus`) in der Faikin-Oberfläche, damit der Adapter Statusänderungen zeitnah empfängt.
 
-Der Broker verwendet unverschlüsseltes MQTT. Betreibe ihn nur in einem vertrauenswürdigen lokalen Netzwerk und gib seinen Port nicht für Zugriffe aus dem Internet frei. Welche Werte verfügbar sind, hängt vom Klimaanlagenmodell und der Firmware ab.
+### Installationsproblem mit npm 12
 
-Installationsproblem mit npm 12
+npm 12 blockiert Installationen direkt aus Git standardmäßig. Dabei kann der Fehler `EALLOWGIT` auftreten. Auf Linux lässt sich Git für einen einzelnen Installationsaufruf freigeben:
 
-npm 12 blockiert Installationen direkt aus Git standardmäßig. Dabei kann der Fehler EALLOWGIT auftreten. Auf Linux lässt sich Git für einen einzelnen Installationsaufruf freigeben:
-
-npm_config_allow_git=all iobroker url https://github.com/BeSiRe1/ioBroker.faikin
+`npm_config_allow_git=all iobroker url https://github.com/BeSiRe1/ioBroker.faikin`
 
 Die Freigabe gilt nur für diesen Aufruf; setze sie nicht dauerhaft.
 
+Der Broker verwendet unverschlüsseltes MQTT. Betreibe ihn nur in einem vertrauenswürdigen lokalen Netzwerk und gib seinen Port nicht für Zugriffe aus dem Internet frei. Welche Werte verfügbar sind, hängt vom Klimaanlagenmodell und der Firmware ab.
 
 ## Versionsverlauf
 
